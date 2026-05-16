@@ -39,7 +39,7 @@ params:
   author: "Jiacheng Zhang"
 
   defaultTheme: auto
-  ShowShareButtons: true
+  ShowShareButtons: false
   ShowReadingTime: true
   ShowPostNavLinks: true
   ShowBreadCrumbs: true
@@ -50,27 +50,22 @@ params:
   ShowToc: true
 
   homeInfoParams:
-    Title: "Jiacheng Zhang"
+    Title: "👋 Jiacheng Zhang"
     Content: |
       这里是 Jiacheng Zhang 的个人博客。
 
-      我会在这里记录技术学习、项目实践、随手思考，以及那些值得认真写下来的东西。
-
-      欢迎从文章列表开始阅读，也可以直接用搜索找到你感兴趣的话题。
+      记录些有的没的。
 
   socialIcons:
     - name: github
       title: GitHub
       url: "https://github.com/JiaCheng310"
-    - name: rss
-      title: RSS
-      url: "/index.xml"
 
   assets:
-    favicon: "/favicon.ico"
-    favicon16x16: "/favicon.ico"
-    favicon32x32: "/favicon.ico"
-    apple_touch_icon: "/favicon.ico"
+    favicon: "/favicon.svg"
+    favicon16x16: "/favicon.svg"
+    favicon32x32: "/favicon.svg"
+    apple_touch_icon: "/favicon.svg"
 
 markup:
   goldmark:
