@@ -1,0 +1,95 @@
+baseURL: "https://jiacheng310.github.io/"
+title: "Jiacheng's blog"
+copyright: "© Jiacheng Zhang"
+theme: ["hugo-PaperMod"]
+
+locale: "zh-cn"
+defaultContentLanguage: "zh"
+
+enableInlineShortcodes: true
+enableRobotsTXT: true
+enableEmoji: true
+buildDrafts: false
+buildFuture: false
+buildExpired: false
+pygmentsUseClasses: true
+mainsections: ["posts"]
+
+minify:
+  disableXML: true
+
+pagination:
+  disableAliases: false
+  pagerSize: 10
+
+taxonomies:
+  category: categories
+  tag: tags
+  series: series
+
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON
+
+params:
+  env: production
+  description: "Jiacheng Zhang 的个人博客，记录技术、想法与写作。"
+  author: "Jiacheng Zhang"
+
+  defaultTheme: auto
+  ShowShareButtons: true
+  ShowReadingTime: true
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowRssButtonInSectionTermList: true
+  ShowAllPagesInArchive: true
+  ShowPageNums: true
+  ShowToc: true
+
+  homeInfoParams:
+    Title: "Jiacheng Zhang"
+    Content: |
+      这里是 Jiacheng Zhang 的个人博客。
+
+      我会在这里记录技术学习、项目实践、随手思考，以及那些值得认真写下来的东西。
+
+      欢迎从文章列表开始阅读，也可以直接用搜索找到你感兴趣的话题。
+
+  socialIcons:
+    - name: github
+      title: GitHub
+      url: "https://github.com/JiaCheng310"
+    - name: rss
+      title: RSS
+      url: "/index.xml"
+
+  assets:
+    favicon: "/favicon.ico"
+    favicon16x16: "/favicon.ico"
+    favicon32x32: "/favicon.ico"
+    apple_touch_icon: "/favicon.ico"
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  highlight:
+    noClasses: false
+
+menu:
+  main:
+    - name: About
+      url: about/
+      weight: 10
+    - name: Archive
+      url: archives/
+      weight: 20
+    - name: Search
+      url: search/
+      weight: 30
+    - name: Tags
+      url: tags/
+      weight: 40

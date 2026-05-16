@@ -1,7 +1,7 @@
 ---
 title: 新文章标题
 description: 用一句话概括这篇文章。
-pubDate: 2026-05-16
+date: 2026-05-16
 tags:
   - Notes
 draft: true

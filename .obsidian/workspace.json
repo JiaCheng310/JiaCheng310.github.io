@@ -11,14 +11,10 @@
             "id": "6c7741f5d87d7751",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "src/content/blog/我的第一篇博客.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "我的第一篇博客"
+              "title": "新标签页"
             }
           }
         ]
@@ -94,7 +90,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "src/content/blog/我的第一篇博客.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +99,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "我的第一篇博客 的反向链接列表"
+              "title": "反向链接"
             }
           },
           {
@@ -113,12 +108,11 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "src/content/blog/我的第一篇博客.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "我的第一篇博客 的出链列表"
+              "title": "出链"
             }
           },
           {
@@ -156,13 +150,12 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "src/content/blog/我的第一篇博客.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "我的第一篇博客 的大纲"
+              "title": "大纲"
             }
           }
         ]
@@ -185,7 +178,32 @@
   },
   "active": "6c7741f5d87d7751",
   "lastOpenFiles": [
+    "themes/hugo-PaperMod/layouts/_partials/templates/_funcs/get-page-images.html",
+    "themes/hugo-PaperMod/layouts/_partials/templates/twitter_cards.html",
+    "themes/hugo-PaperMod/layouts/_partials/templates/opengraph.html",
+    "themes/hugo-PaperMod/layouts/_partials/templates/schema_json.html",
+    "themes/hugo-PaperMod/layouts/_partials/templates/_funcs",
+    "themes/hugo-PaperMod/assets/css/core/zmedia.css",
+    "themes/hugo-PaperMod/assets/css/core/theme-vars.css",
+    "themes/hugo-PaperMod/assets/css/core/reset.css",
+    "themes/hugo-PaperMod/assets/css/core/license.css",
+    "themes/hugo-PaperMod/assets/css/includes/chroma-styles.css",
+    "themes/hugo-PaperMod/assets/css/includes/chroma-mod.css",
+    "themes/hugo-PaperMod/images/tn.png",
+    "themes/hugo-PaperMod/images/screenshot.png",
+    "themes/hugo-PaperMod/README.md",
+    "public/favicon.svg",
+    "content/archives.md",
+    "themes/PaperMod/images/tn.png",
+    "themes/PaperMod/images/screenshot.png",
+    "themes/PaperMod/README.md",
+    "static/favicon.svg",
     "src/content/blog/我的第一篇博客.md",
+    "content/posts/我的第一篇博客.md",
+    "content/search.md",
+    "content/about.md",
+    "content/_index.md",
+    "archetypes/default.md",
     "obsidian/blog-post-template.md",
     "src/content/blog/未命名.md",
     "src/content/blog/third-post.md",

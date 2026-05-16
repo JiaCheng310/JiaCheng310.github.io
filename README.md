@@ -1,63 +1,58 @@
-# Astro Starter Kit: Blog
+# Jiacheng's blog
 
-```sh
-npm create astro@latest -- --template blog
-```
+这是一个基于 Hugo 架构的个人博客项目，视觉风格参考了 PaperMod。
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-Features:
-
-- ✅ Minimal styling (make it your own!)
-- ✅ 100/100 Lighthouse performance
-- ✅ SEO-friendly with canonical URLs and Open Graph data
-- ✅ Sitemap support
-- ✅ RSS Feed support
-- ✅ Markdown & MDX support
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
+## 目录结构
 
 ```text
-├── public/
-├── src/
-│   ├── assets/
-│   ├── components/
-│   ├── content/
-│   ├── layouts/
-│   └── pages/
-├── astro.config.mjs
-├── README.md
-├── package.json
-└── tsconfig.json
+.
+├── archetypes/
+├── assets/
+├── content/
+│   ├── about.md
+│   ├── search.md
+│   └── posts/
+├── layouts/
+├── static/
+├── hugo.yaml
+├── OBSIDIAN.md
+└── obsidian/
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## 写作方式
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+推荐直接用 Obsidian 打开项目根目录，然后在 `content/posts/` 下写文章。
 
-The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/blog/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
+新文章最简单的结构是：
 
-Any static assets, like images, can be placed in the `public/` directory.
+```text
+content/posts/my-new-post/index.md
+content/posts/my-new-post/cover.png
+```
 
-## 🧞 Commands
+文章模板见：
 
-All commands are run from the root of the project, from a terminal:
+- [OBSIDIAN.md](./OBSIDIAN.md)
+- [obsidian/blog-post-template.md](./obsidian/blog-post-template.md)
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## 发布流程
 
-## 👀 Want to learn more?
+写完内容后执行：
 
-Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+```bash
+git add .
+git commit -m "发布新文章"
+git push
+```
 
-## Credit
+推送到 `main` 后，GitHub Actions 会自动构建并发布到 GitHub Pages。
 
-This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+## 本地预览
+
+本地预览需要安装 Hugo，然后运行：
+
+```bash
+hugo server
+```
+
+如果你还没安装 Hugo，也可以先继续写作，等需要本地预览时再安装。
