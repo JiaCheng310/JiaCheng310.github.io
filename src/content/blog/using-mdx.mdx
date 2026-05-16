@@ -1,0 +1,20 @@
+---
+title: 'Using MDX for Small Interactive Notes'
+description: 'MDX is available when a post needs components, but plain Markdown remains the default.'
+pubDate: '2026-04-20'
+tags:
+  - MDX
+  - Astro
+---
+
+Most posts on this site can stay as regular Markdown. That keeps writing friction low and the content easy to move.
+
+## When MDX helps
+
+MDX is useful when a post benefits from one small component: a callout, a chart, or an embedded demo. It is best treated as an exception, not the baseline.
+
+## Example
+
+import HeaderLink from '../../components/HeaderLink.astro';
+
+<HeaderLink href="/blog">Back to archive</HeaderLink>

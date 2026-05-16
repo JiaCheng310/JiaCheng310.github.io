@@ -1,0 +1,95 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import { sortPosts } from '../../utils/blog';
+
+const posts = sortPosts((await getCollection('blog')).filter((post) => !post.data.draft));
+---
+
+<BaseLayout title={`Archive | ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
+	<section class="archive">
+		<div class="archive__header">
+			<p class="archive__eyebrow">Archive</p>
+			<h1>All posts</h1>
+			<p class="archive__description">A chronological list of essays, notes, and experiments.</p>
+		</div>
+
+		<ul class="archive__list">
+			{
+				posts.map((post) => (
+					<li>
+						<a href={`/blog/${post.id}/`} class="archive__item">
+							<div>
+								<h2>{post.data.title}</h2>
+								<p>{post.data.description}</p>
+							</div>
+							<span><FormattedDate date={post.data.pubDate} /></span>
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</section>
+</BaseLayout>
+
+<style>
+	.archive {
+		max-width: 52rem;
+	}
+
+	.archive__header {
+		margin-bottom: 2rem;
+	}
+
+	.archive__eyebrow {
+		font-size: 0.78rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--color-muted);
+	}
+
+	.archive__description {
+		color: var(--color-muted);
+		max-width: 38rem;
+	}
+
+	.archive__list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		border-top: 1px solid var(--color-border);
+	}
+
+	.archive__item {
+		display: flex;
+		justify-content: space-between;
+		gap: 1.5rem;
+		padding: 1.1rem 0;
+		border-bottom: 1px solid var(--color-border);
+		text-decoration: none;
+	}
+
+	.archive__item h2 {
+		font-size: 1.08rem;
+		margin-bottom: 0.35rem;
+	}
+
+	.archive__item p,
+	.archive__item span {
+		color: var(--color-muted);
+	}
+
+	.archive__item span {
+		white-space: nowrap;
+		font-size: 0.92rem;
+	}
+
+	@media (max-width: 640px) {
+		.archive__item {
+			flex-direction: column;
+			gap: 0.65rem;
+		}
+	}
+</style>

@@ -1,0 +1,142 @@
+---
+import { SEARCH_PLACEHOLDER } from '../consts';
+
+interface SearchItem {
+	title: string;
+	description: string;
+	url: string;
+	tags: string[];
+	pubDate: string;
+}
+---
+
+<section class="search-panel" aria-labelledby="search-heading">
+	<div class="search-panel__header">
+		<h2 id="search-heading">Search</h2>
+		<p>Find posts by title, summary, or tag.</p>
+	</div>
+	<label class="search-panel__label" for="post-search">
+		<span class="sr-only">Search posts</span>
+		<input id="post-search" type="search" placeholder={SEARCH_PLACEHOLDER} autocomplete="off" />
+	</label>
+	<ul class="search-results" id="search-results"></ul>
+</section>
+
+<script is:inline>
+	const input = document.querySelector('#post-search');
+	const results = document.querySelector('#search-results');
+
+	if (input instanceof HTMLInputElement && results instanceof HTMLUListElement) {
+		let items = [];
+
+		const render = (list) => {
+			results.innerHTML = '';
+
+			if (!input.value.trim()) {
+				results.innerHTML = '<li class="search-results__empty">Start typing to filter the archive.</li>';
+				return;
+			}
+
+			if (!list.length) {
+				results.innerHTML = '<li class="search-results__empty">No matching posts yet.</li>';
+				return;
+			}
+
+			list.slice(0, 8).forEach((item) => {
+				const li = document.createElement('li');
+				li.className = 'search-results__item';
+				li.innerHTML = `
+					<a href="${item.url}">
+						<strong>${item.title}</strong>
+						<span>${item.description}</span>
+						<small>${item.tags.join(' · ')}</small>
+					</a>
+				`;
+				results.appendChild(li);
+			});
+		};
+
+		const search = () => {
+			const keyword = input.value.trim().toLowerCase();
+			const filtered = items.filter((item) =>
+				[item.title, item.description, item.tags.join(' ')].some((field) =>
+					field.toLowerCase().includes(keyword),
+				),
+			);
+			render(filtered);
+		};
+
+		fetch('/search.json')
+			.then((response) => response.json())
+			.then((data) => {
+				items = data;
+				render([]);
+			})
+			.catch(() => {
+				results.innerHTML =
+					'<li class="search-results__empty">Search index could not be loaded.</li>';
+			});
+
+		input.addEventListener('input', search);
+	}
+</script>
+
+<style>
+	.search-panel {
+		padding: 1.5rem 0 0;
+	}
+
+	.search-panel__header {
+		margin-bottom: 1rem;
+	}
+
+	.search-panel__header h2 {
+		font-size: 1rem;
+		margin-bottom: 0.35rem;
+	}
+
+	.search-panel__header p {
+		margin: 0;
+		color: var(--color-muted);
+		font-size: 0.95rem;
+	}
+
+	.search-panel__label input {
+		width: 100%;
+		border: 1px solid var(--color-border);
+		background: var(--color-surface);
+		color: var(--color-text);
+		border-radius: 0.9rem;
+		padding: 0.95rem 1rem;
+		font: inherit;
+	}
+
+	.search-results {
+		list-style: none;
+		margin: 1rem 0 0;
+		padding: 0;
+		display: grid;
+		gap: 0.75rem;
+	}
+
+	.search-results__item a,
+	.search-results__empty {
+		display: grid;
+		gap: 0.3rem;
+		padding: 1rem;
+		border: 1px solid var(--color-border);
+		border-radius: 0.9rem;
+		text-decoration: none;
+		background: var(--color-surface);
+	}
+
+	.search-results__item strong {
+		font-size: 0.98rem;
+	}
+
+	.search-results__item span,
+	.search-results__item small,
+	.search-results__empty {
+		color: var(--color-muted);
+	}
+</style>

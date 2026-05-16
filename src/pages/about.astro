@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { AUTHOR_BIO, AUTHOR_EMAIL, AUTHOR_NAME, SITE_TITLE } from '../consts';
+---
+
+<BaseLayout title={`About | ${SITE_TITLE}`} description={AUTHOR_BIO}>
+	<section class="about">
+		<p class="about__eyebrow">About</p>
+		<h1>{AUTHOR_NAME}</h1>
+		<p class="about__lead">{AUTHOR_BIO}</p>
+		<div class="about__body">
+			<p>
+				This site is built with Astro and keeps a template-first structure on purpose: plain Markdown,
+				fast static pages, and a reading experience that stays out of the way.
+			</p>
+			<p>
+				Use this page for a short biography, what you work on, what you are learning now, and the kinds
+				of writing people can expect here.
+			</p>
+			<p>
+				Reach me at <a href={`mailto:${AUTHOR_EMAIL}`}>{AUTHOR_EMAIL}</a>.
+			</p>
+		</div>
+	</section>
+</BaseLayout>
+
+<style>
+	.about {
+		max-width: 42rem;
+	}
+
+	.about__eyebrow {
+		font-size: 0.78rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--color-muted);
+	}
+
+	.about__lead {
+		font-size: 1.08rem;
+		color: var(--color-muted);
+	}
+
+	.about__body {
+		display: grid;
+		gap: 1rem;
+	}
+</style>

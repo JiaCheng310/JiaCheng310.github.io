@@ -1,0 +1,56 @@
+---
+import { COMMENTS } from '../consts';
+---
+
+<section class="comments">
+	<h2>Comments</h2>
+	{
+		COMMENTS.enabled ? (
+			<div id="giscus-thread"></div>
+		) : (
+			<p class="comments__hint">
+				Comments are wired for Giscus. Add your repository metadata in <code>src/consts.ts</code> to
+				enable them.
+			</p>
+		)
+	}
+</section>
+
+{
+	COMMENTS.enabled && (
+		<script
+			is:inline
+			src="https://giscus.app/client.js"
+			data-repo={COMMENTS.repo}
+			data-repo-id={COMMENTS.repoId}
+			data-category={COMMENTS.category}
+			data-category-id={COMMENTS.categoryId}
+			data-mapping={COMMENTS.mapping}
+			data-strict={COMMENTS.strict}
+			data-reactions-enabled={COMMENTS.reactionsEnabled}
+			data-input-position={COMMENTS.inputPosition}
+			data-theme="preferred_color_scheme"
+			data-lang={COMMENTS.lang}
+			crossorigin="anonymous"
+			async
+		></script>
+	)
+}
+
+<style>
+	.comments {
+		margin-top: 3rem;
+		padding-top: 2rem;
+		border-top: 1px solid var(--color-border);
+	}
+
+	.comments h2 {
+		font-size: 1rem;
+		margin-bottom: 1rem;
+	}
+
+	.comments__hint {
+		color: var(--color-muted);
+		font-size: 0.95rem;
+	}
+</style>

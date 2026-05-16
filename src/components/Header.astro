@@ -1,0 +1,89 @@
+---
+import { NAV_LINKS, SITE_TITLE } from '../consts';
+import HeaderLink from './HeaderLink.astro';
+import ThemeToggle from './ThemeToggle.astro';
+---
+
+<header>
+	<nav>
+		<div class="brand">
+			<h2><a href="/">{SITE_TITLE}</a></h2>
+			<p>minimal writing with Astro</p>
+		</div>
+		<div class="nav-group">
+			<div class="internal-links">
+				{NAV_LINKS.map((item) => <HeaderLink href={item.href}>{item.label}</HeaderLink>)}
+			</div>
+			<ThemeToggle />
+		</div>
+	</nav>
+</header>
+
+<style>
+	header {
+		padding: 1.5rem 1.25rem 0;
+	}
+
+	nav {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		max-width: 72rem;
+		margin: 0 auto;
+	}
+
+	.brand {
+		display: grid;
+		gap: 0.2rem;
+	}
+
+	h2 {
+		margin: 0;
+		font-size: 1rem;
+	}
+
+	h2 a,
+	h2 a.active {
+		text-decoration: none;
+	}
+
+	.brand p {
+		margin: 0;
+		font-size: 0.9rem;
+		color: var(--color-muted);
+	}
+
+	.nav-group,
+	.internal-links {
+		display: flex;
+		align-items: center;
+	}
+
+	.nav-group {
+		gap: 1rem;
+	}
+
+	.internal-links {
+		flex-wrap: wrap;
+	}
+
+	nav a {
+		padding: 0.2rem 0.5rem;
+		color: var(--color-text);
+		border-bottom: 2px solid transparent;
+		text-decoration: none;
+	}
+
+	nav a.active {
+		border-bottom-color: var(--color-text);
+	}
+
+	@media (max-width: 840px) {
+		nav,
+		.nav-group {
+			flex-direction: column;
+			align-items: flex-start;
+		}
+	}
+</style>

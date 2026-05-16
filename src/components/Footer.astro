@@ -1,0 +1,27 @@
+---
+import { AUTHOR_NAME, SITE_TITLE } from '../consts';
+const today = new Date();
+---
+
+<footer>
+	<p>&copy; {today.getFullYear()} {SITE_TITLE}. By {AUTHOR_NAME}.</p>
+	<p class="footer-note">RSS included. Comments can be added later.</p>
+</footer>
+
+<style>
+	footer {
+		max-width: 72rem;
+		margin: 0 auto;
+		padding: 2rem 1.25rem 4rem;
+		color: var(--color-muted);
+		text-align: center;
+	}
+
+	footer p {
+		margin: 0.35rem 0;
+	}
+
+	.footer-note {
+		font-size: 0.92rem;
+	}
+</style>
