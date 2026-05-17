@@ -2,6 +2,7 @@
 title: 位置编码学习笔记（一）：Sinusoidal
 description: 简要介绍绝对位置编码和Sinusoidal位置编码
 date: 2026-05-16
+slug: positional-encoding-sinusoidal-1
 tags:
   - Notes
 draft: false
@@ -54,4 +55,3 @@ y_n = f(q_n,x_1,...,x_L) = \frac{\sum^n_{m=1}e^{q_n\cdot k_m}v_m}{\sum^n_{m=1}e^
 $$
 
 就是把 $(1)$ 式中的 $L$ 换成了 $n$ ，这一结果依赖于 $x_1,...,x_L$ 的顺序，因此不具有置换不变性，那么这种位置信息是怎么隐含的呢？
-

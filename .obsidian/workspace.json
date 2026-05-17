@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "content/posts/位置编码（一）：Sinusoidal/位置编码（一）：Sinusoidal.md",
+                "file": "content/posts/位置编码（一）：Sinusoidal/index.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "位置编码（一）：Sinusoidal"
+              "title": "index"
             }
           }
         ]
@@ -185,24 +185,27 @@
   },
   "active": "6c7741f5d87d7751",
   "lastOpenFiles": [
+    "layouts/_markup/render-image.html",
+    "layouts/_markup",
+    "content/posts/我的第一篇博客.md",
+    "public/posts/positional-encoding-sinusoidal-1/index.html",
+    "public/posts/positional-encoding-sinusoidal-1/images/Pasted image 20260517111610.png",
+    "public/posts/positional-encoding-sinusoidal-1/images",
+    "public/posts/positional-encoding-sinusoidal-1",
+    "content/posts/位置编码（一）：Sinusoidal/位置编码（一）：Sinusoidal.md",
+    "content/posts/位置编码（一）：Sinusoidal/index.md",
+    "public/posts/位置编码一sinusoidal/位置编码一sinusoidal/index.html",
+    "public/posts/位置编码一sinusoidal/位置编码一sinusoidal",
+    "public/posts/位置编码一sinusoidal",
     "public/posts/位置编码（一）：Sinusoidal/images/Pasted image 20260517111610.png",
     "public/posts/位置编码（一）：Sinusoidal/images",
     "public/posts/位置编码（一）：Sinusoidal",
     "layouts/_default/single.html",
-    "layouts/partials/obsidian_content.html",
     "content/posts/位置编码（一）：Sinusoidal/images/Pasted image 20260517111610.png",
-    "content/posts/位置编码（一）：Sinusoidal/images",
-    "content/posts/我的第一篇博客.md",
-    "content/posts/位置编码（一）：Sinusoidal/位置编码（一）：Sinusoidal.md",
     "Pasted image 20260517111524.png",
     "content/posts/位置编码：Sinusoidal/未命名.md",
     "obsidian/blog-post-template 1.md",
-    "public/posts/位置编码sinusoidal/未命名/index.html",
-    "public/posts/位置编码sinusoidal/未命名",
-    "public/posts/位置编码sinusoidal",
-    "layouts/partials/extend_head.html",
     "content/about.md",
-    "content/posts/位置编码（一）：Sinusoidal",
     "content/archives.md",
     "content/search.md",
     "content/_index.md",
