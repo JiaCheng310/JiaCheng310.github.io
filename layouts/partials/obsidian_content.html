@@ -1,0 +1,4 @@
+{{- $content := .RawContent -}}
+{{- $content = replaceRE `!\[\[([^|\]]+)\|([^\]]+)\]\]` `![$2](./$1)` $content -}}
+{{- $content = replaceRE `!\[\[([^\]]+)\]\]` `![](.\/$1)` $content -}}
+{{- .RenderString (dict "display" "block") $content -}}

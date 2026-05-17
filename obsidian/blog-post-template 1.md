@@ -21,6 +21,6 @@ math: false
 ## 备注
 
 - 图片建议和文章放在同一个文件夹
-- 图片使用标准 Markdown 语法引用
+- 图片使用标准 Markdown 语法引用，或直接使用 `![[image.png]]`
 - 如果这篇文章有公式，把 `math: false` 改成 `math: true`
 - 准备发布时，把 `draft: true` 改成 `draft: false` 或直接删除

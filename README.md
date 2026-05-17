@@ -33,7 +33,7 @@ content/posts/my-new-post/cover.png
 文章模板见：
 
 - [OBSIDIAN.md](./OBSIDIAN.md)
-- [obsidian/blog-post-template.md](./obsidian/blog-post-template.md)
+- [obsidian/blog-post-template.md](位置编码（一）：Sinusoidal.md)
 
 ## 发布流程
 

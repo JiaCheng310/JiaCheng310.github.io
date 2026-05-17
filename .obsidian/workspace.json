@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "content/posts/位置编码：Sinusoidal/未命名.md",
+                "file": "content/posts/位置编码（一）：Sinusoidal/位置编码（一）：Sinusoidal.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "未命名"
+              "title": "位置编码（一）：Sinusoidal"
             }
           }
         ]
@@ -185,23 +185,27 @@
   },
   "active": "6c7741f5d87d7751",
   "lastOpenFiles": [
+    "public/posts/位置编码（一）：Sinusoidal/images/Pasted image 20260517111610.png",
+    "public/posts/位置编码（一）：Sinusoidal/images",
+    "public/posts/位置编码（一）：Sinusoidal",
+    "layouts/_default/single.html",
+    "layouts/partials/obsidian_content.html",
+    "content/posts/位置编码（一）：Sinusoidal/images/Pasted image 20260517111610.png",
+    "content/posts/位置编码（一）：Sinusoidal/images",
+    "content/posts/我的第一篇博客.md",
+    "content/posts/位置编码（一）：Sinusoidal/位置编码（一）：Sinusoidal.md",
+    "Pasted image 20260517111524.png",
+    "content/posts/位置编码：Sinusoidal/未命名.md",
+    "obsidian/blog-post-template 1.md",
     "public/posts/位置编码sinusoidal/未命名/index.html",
     "public/posts/位置编码sinusoidal/未命名",
     "public/posts/位置编码sinusoidal",
     "layouts/partials/extend_head.html",
     "content/about.md",
-    "content/posts/位置编码：Sinusoidal/未命名.md",
-    "content/posts/位置编码：Sinusoidal",
+    "content/posts/位置编码（一）：Sinusoidal",
     "content/archives.md",
     "content/search.md",
     "content/_index.md",
-    "content/posts/我的第一篇博客.md",
-    "themes/hugo-PaperMod/layouts/_partials/templates/_funcs/get-page-images.html",
-    "themes/hugo-PaperMod/layouts/_partials/templates/twitter_cards.html",
-    "themes/hugo-PaperMod/layouts/_partials/templates/opengraph.html",
-    "themes/hugo-PaperMod/layouts/_partials/templates/schema_json.html",
-    "themes/hugo-PaperMod/layouts/_partials/templates/_funcs",
-    "themes/hugo-PaperMod/assets/css/core/zmedia.css",
     "themes/hugo-PaperMod/images/tn.png",
     "themes/hugo-PaperMod/images/screenshot.png",
     "themes/hugo-PaperMod/README.md",
@@ -212,7 +216,6 @@
     "static/favicon.svg",
     "src/content/blog/我的第一篇博客.md",
     "archetypes/default.md",
-    "obsidian/blog-post-template.md",
     "src/content/blog/未命名.md",
     "src/content/blog/third-post.md",
     "src/content/blog/second-post.md",
