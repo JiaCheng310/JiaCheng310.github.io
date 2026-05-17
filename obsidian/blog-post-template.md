@@ -5,6 +5,7 @@ date: 2026-05-16
 tags:
   - Notes
 draft: true
+math: false
 ---
 
 这里写开头。
@@ -21,4 +22,5 @@ draft: true
 
 - 图片建议和文章放在同一个文件夹
 - 图片使用标准 Markdown 语法引用
+- 如果这篇文章有公式，把 `math: false` 改成 `math: true`
 - 准备发布时，把 `draft: true` 改成 `draft: false` 或直接删除

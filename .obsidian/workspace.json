@@ -11,10 +11,14 @@
             "id": "6c7741f5d87d7751",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "content/posts/位置编码：Sinusoidal/未命名.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "新标签页"
+              "title": "未命名"
             }
           }
         ]
@@ -90,6 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "content/about.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -99,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "反向链接"
+              "title": "about 的反向链接列表"
             }
           },
           {
@@ -108,11 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "content/about.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "出链"
+              "title": "about 的出链列表"
             }
           },
           {
@@ -150,12 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "content/about.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "大纲"
+              "title": "about 的大纲"
             }
           }
         ]
@@ -178,31 +185,32 @@
   },
   "active": "6c7741f5d87d7751",
   "lastOpenFiles": [
+    "public/posts/位置编码sinusoidal/未命名/index.html",
+    "public/posts/位置编码sinusoidal/未命名",
+    "public/posts/位置编码sinusoidal",
+    "layouts/partials/extend_head.html",
+    "content/about.md",
+    "content/posts/位置编码：Sinusoidal/未命名.md",
+    "content/posts/位置编码：Sinusoidal",
+    "content/archives.md",
+    "content/search.md",
+    "content/_index.md",
+    "content/posts/我的第一篇博客.md",
     "themes/hugo-PaperMod/layouts/_partials/templates/_funcs/get-page-images.html",
     "themes/hugo-PaperMod/layouts/_partials/templates/twitter_cards.html",
     "themes/hugo-PaperMod/layouts/_partials/templates/opengraph.html",
     "themes/hugo-PaperMod/layouts/_partials/templates/schema_json.html",
     "themes/hugo-PaperMod/layouts/_partials/templates/_funcs",
     "themes/hugo-PaperMod/assets/css/core/zmedia.css",
-    "themes/hugo-PaperMod/assets/css/core/theme-vars.css",
-    "themes/hugo-PaperMod/assets/css/core/reset.css",
-    "themes/hugo-PaperMod/assets/css/core/license.css",
-    "themes/hugo-PaperMod/assets/css/includes/chroma-styles.css",
-    "themes/hugo-PaperMod/assets/css/includes/chroma-mod.css",
     "themes/hugo-PaperMod/images/tn.png",
     "themes/hugo-PaperMod/images/screenshot.png",
     "themes/hugo-PaperMod/README.md",
     "public/favicon.svg",
-    "content/archives.md",
     "themes/PaperMod/images/tn.png",
     "themes/PaperMod/images/screenshot.png",
     "themes/PaperMod/README.md",
     "static/favicon.svg",
     "src/content/blog/我的第一篇博客.md",
-    "content/posts/我的第一篇博客.md",
-    "content/search.md",
-    "content/about.md",
-    "content/_index.md",
     "archetypes/default.md",
     "obsidian/blog-post-template.md",
     "src/content/blog/未命名.md",

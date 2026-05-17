@@ -73,6 +73,26 @@ heroImage: './cover.png'
 6. 本地预览时运行 `hugo server`
 7. 发布时执行 `git add . && git commit -m "new post" && git push`
 
+## 数学公式
+
+如果一篇文章需要 LaTeX 公式，在文章 frontmatter 里加上：
+
+```md
+math: true
+```
+
+然后就可以直接写：
+
+```md
+行内公式：$E = mc^2$
+
+块级公式：
+
+$$
+\int_a^b f(x)\,dx
+$$
+```
+
 ## 示例
 
 推荐目录结构：

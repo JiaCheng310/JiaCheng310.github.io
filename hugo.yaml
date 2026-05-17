@@ -37,6 +37,7 @@ params:
   env: production
   description: "Jiacheng Zhang 的个人博客，记录技术、想法与写作。"
   author: "Jiacheng Zhang"
+  math: false
 
   defaultTheme: auto
   ShowShareButtons: false
