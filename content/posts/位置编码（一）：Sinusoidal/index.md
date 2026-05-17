@@ -73,12 +73,10 @@ $$
 考虑一串输入 $\{x_m\}_{m=1}^L$ ，假设每个 $x_m \sim \mathcal{N}(0, \sigma^2)\in \mathbb{R}^d$，我们可以计算：
 
 $$
-\bar{x}_{m,:}  
-=  
-\frac{\sum_{i=1}^{d} x_{mi}}{d},\quad\quad
-S(x_{m,:})  
-=  
-\frac{\sum_{i=1}^{d}(x_{mi}-\bar{x}_{m,:})^2}{d}
+\begin{aligned}
+\bar{x}_{m,:} &= \frac{\sum_{i=1}^{d} x_{mi}}{d},\\
+S(x_{m,:}) &= \frac{\sum_{i=1}^{d}(x_{mi}-\bar{x}_{m,:})^2}{d}
+\end{aligned}
 $$
 
  $x_m$ 首先会经过Layer Normalization：
@@ -130,7 +128,8 @@ $$
 因此上式有：
 
 $$
-\text{Tr}(\mathbb{E}[r_j r_i^\top][ e_me_m^\top ]) = \text{Tr}((\mathbb{I}_{i=j} \sigma^2 I_d) \cdot I_d) = \mathbb{I}_{i=j} \sigma^2 \text{Tr}(I_d)$$
+\text{Tr}(\mathbb{E}[r_j r_i^\top][ e_me_m^\top ]) = \text{Tr}((\mathbb{I}_{i=j} \sigma^2 I_d) \cdot I_d) = \mathbb{I}_{i=j} \sigma^2 \text{Tr}(I_d)
+$$
 
 因此投影后的元素 $q_m$ 的协方差矩阵 
 
