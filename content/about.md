@@ -9,7 +9,7 @@ disableShare: true
 ShowBreadcrumbs: false
 ---
 
-这是 Jiacheng Zhang 的个人博客。
+这是张家铖的个人博客。
 
 这里会记录技术学习、项目实践、写作尝试，以及一些值得认真保留下来的想法。
 

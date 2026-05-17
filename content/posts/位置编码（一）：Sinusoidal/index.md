@@ -4,7 +4,8 @@ description: 简要介绍绝对位置编码和Sinusoidal位置编码
 date: 2026-05-16
 slug: positional-encoding-sinusoidal-1
 tags:
-  - Notes
+  - "#位置编码"
+  - "#BERT"
 draft: false
 math: true
 ---
@@ -54,4 +55,10 @@ $$
 y_n = f(q_n,x_1,...,x_L) = \frac{\sum^n_{m=1}e^{q_n\cdot k_m}v_m}{\sum^n_{m=1}e^{q_n\cdot k_m}}
 $$
 
-就是把 $(1)$ 式中的 $L$ 换成了 $n$ ，这一结果依赖于 $x_1,...,x_L$ 的顺序，因此不具有置换不变性，那么这种位置信息是怎么隐含的呢？
+就是把 $(1)$ 式中的 $L$ 换成了 $n$ ，这一结果依赖于 $x_1,...,x_L$ 的顺序，因此不具有置换不变性，那么这种位置信息能够给模型多强的先验？
+
+[《Transformer Language Models without Positional Encodings Still Learn Positional Information》](https://papers.cool/arxiv/2203.16634)这篇论文做了相关的实验，他们利用探针检测了随层数变化，每个 token 的 hidden state 隐含位置信息的偏差：
+
+ ![[Pasted image 20260517140903.png]]
+ 
+ NoPE的模型在前几层一开始没有位置信息，但在大约 4 层内误差快速下降，即这一过程中模型借助因果掩码逐步学到了位置信息，而后期所有的位置编码误差都上升了，这与[《The Bottom-up Evolution of Representations in the Transformer: A Study with Machine Translation and Language Modeling Objectives》](https://papers.cool/arxiv/1909.01380)中揭示的现象也一致：到了深层，模型已经提取了高度抽象的语义信息，关注前面词的精确位置对于预测下一个词不再有直接的帮助，因此“遗忘”了这些信息。
