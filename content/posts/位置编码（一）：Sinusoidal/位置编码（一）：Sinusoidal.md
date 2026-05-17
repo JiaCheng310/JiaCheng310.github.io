@@ -4,7 +4,7 @@ description: 简要介绍绝对位置编码和Sinusoidal位置编码
 date: 2026-05-16
 tags:
   - Notes
-draft: true
+draft: false
 math: true
 ---
 ## 一、为什么需要位置编码
