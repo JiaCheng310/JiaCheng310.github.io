@@ -19,7 +19,9 @@ math: true
 $$
 y_n = f(q_n,x_1,x_2,...,x_L) = \frac{\sum_{m=1}^Le^{q_n\cdot k_m}v_m}{\sum_{m=1}^Le^{q_n\cdot k_m}}
 \tag{1}
-$$这就会出现：
+$$
+
+这就会出现：
 
 $$
 y_n = f(q_n,x_1,x_2,...,x_p,...,x_q,...,x_n) = f(q_n,x_1,x_2,...,x_q,...,x_p,...,x_n)
@@ -145,15 +147,15 @@ $$
 $$
 \begin{aligned}
 \operatorname{cov}&(l_{mn}, l_{mp}) \\
-&= \mathbb{E}[(\boldsymbol{e}_m^\top \boldsymbol{W}_q^\top \boldsymbol{W}_k \boldsymbol{e}_n)(\boldsymbol{e}_m^\top \boldsymbol{W}_q^\top \boldsymbol{W}_k \boldsymbol{e}_p)^\top] \\
-&= \mathbb{E}[\operatorname{Tr}(\boldsymbol{e}_m^\top \boldsymbol{W}_q^\top \boldsymbol{W}_k \boldsymbol{e}_n \boldsymbol{e}_p^\top \boldsymbol{W}_k^\top \boldsymbol{W}_q \boldsymbol{e}_m)] \\
-&= \mathbb{E}[\operatorname{Tr}(\boldsymbol{e}_m \boldsymbol{e}_m^\top \boldsymbol{W}_q^\top \boldsymbol{W}_k \boldsymbol{e}_n \boldsymbol{e}_p^\top \boldsymbol{W}_k^\top \boldsymbol{W}_q)] \\
-&= \operatorname{Tr}(\mathbb{E}[\boldsymbol{e}_m \boldsymbol{e}_m^\top]\mathbb{E}[\boldsymbol{W}_q^\top \boldsymbol{W}_k \boldsymbol{e}_n \boldsymbol{e}_p^\top \boldsymbol{W}_k^\top \boldsymbol{W}_q]) \\
-&= \mathbb{E}[\operatorname{Tr}(\boldsymbol{e}_n \boldsymbol{e}_p^\top \boldsymbol{W}_k^\top \boldsymbol{W}_q \boldsymbol{W}_q^\top \boldsymbol{W}_k)] \\
-&= \operatorname{Tr}(\mathbb{E}[\boldsymbol{e}_n \boldsymbol{e}_p^\top]\mathbb{E}[\boldsymbol{W}_k^\top \boldsymbol{W}_q \boldsymbol{W}_q^\top \boldsymbol{W}_k]) \\
-&= (\mathbb{1}_{n=p})\operatorname{Tr}(\mathbb{E}[\boldsymbol{W}_q \boldsymbol{W}_q^\top]\mathbb{E}[\boldsymbol{W}_k \boldsymbol{W}_k^\top]) \\
-&= (\mathbb{1}_{n=p})\operatorname{Tr}\left((\frac{d}{H}\sigma^2 \cdot \boldsymbol{I})(\frac{d}{H}\sigma^2 \cdot \boldsymbol{I})\right) \\
-&= (\mathbb{1}_{n=p})\frac{d^3\sigma^4}{H^2}
+&= \mathbb{E}[(\mathbf{e}_m^\top \mathbf{W}_q^\top \mathbf{W}_k \mathbf{e}_n)(\mathbf{e}_m^\top \mathbf{W}_q^\top \mathbf{W}_k \mathbf{e}_p)^\top] \\
+&= \mathbb{E}[\operatorname{Tr}(\mathbf{e}_m^\top \mathbf{W}_q^\top \mathbf{W}_k \mathbf{e}_n \mathbf{e}_p^\top \mathbf{W}_k^\top \mathbf{W}_q \mathbf{e}_m)] \\
+&= \mathbb{E}[\operatorname{Tr}(\mathbf{e}_m \mathbf{e}_m^\top \mathbf{W}_q^\top \mathbf{W}_k \mathbf{e}_n \mathbf{e}_p^\top \mathbf{W}_k^\top \mathbf{W}_q)] \\
+&= \operatorname{Tr}(\mathbb{E}[\mathbf{e}_m \mathbf{e}_m^\top]\mathbb{E}[\mathbf{W}_q^\top \mathbf{W}_k \mathbf{e}_n \mathbf{e}_p^\top \mathbf{W}_k^\top \mathbf{W}_q]) \\
+&= \mathbb{E}[\operatorname{Tr}(\mathbf{e}_n \mathbf{e}_p^\top \mathbf{W}_k^\top \mathbf{W}_q \mathbf{W}_q^\top \mathbf{W}_k)] \\
+&= \operatorname{Tr}(\mathbb{E}[\mathbf{e}_n \mathbf{e}_p^\top]\mathbb{E}[\mathbf{W}_k^\top \mathbf{W}_q \mathbf{W}_q^\top \mathbf{W}_k]) \\
+&= (\mathbf{1}_{n=p})\operatorname{Tr}(\mathbb{E}[\mathbf{W}_q \mathbf{W}_q^\top]\mathbb{E}[\mathbf{W}_k \mathbf{W}_k^\top]) \\
+&= (\mathbf{1}_{n=p})\operatorname{Tr}\left((\frac{d}{H}\sigma^2 \cdot \mathbf{I})(\frac{d}{H}\sigma^2 \cdot \mathbf{I})\right) \\
+&= (\mathbf{1}_{n=p})\frac{d^3\sigma^4}{H^2}
 \end{aligned}
 $$
 
