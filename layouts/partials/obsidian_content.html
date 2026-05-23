@@ -1,4 +1,6 @@
 {{- $content := .RawContent -}}
+{{- $content = replaceRE `!\[\[[^|\]]*/images/([^|\]]+\.(png|jpg|jpeg|gif|webp|svg))\|([^\]]+)\]\]` `![$3](<./images/$1>)` $content -}}
+{{- $content = replaceRE `!\[\[[^|\]]*/images/([^|\]]+\.(png|jpg|jpeg|gif|webp|svg))\]\]` `![](<./images/$1>)` $content -}}
 {{- $content = replaceRE `!\[\[([^\]|]+\.(png|jpg|jpeg|gif|webp|svg))\|([^\]]+)\]\]` `![$3](<./images/$1>)` $content -}}
 {{- $content = replaceRE `!\[\[([^\]]+\.(png|jpg|jpeg|gif|webp|svg))\]\]` `![](<./images/$1>)` $content -}}
 {{- $content = replaceRE `!\[\[([^\]|]+)\|([^\]]+)\]\]` `![$2](<$1>)` $content -}}

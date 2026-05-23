@@ -29,7 +29,7 @@ $$
 
 即任意交换送入token的位置关系，输出不变，这就是**Attention的置换不变性**。
 
-![[content/posts/位置编码（一）：为什么需要位置编码/images/Pasted image 20260517111610.png]]
+![[Pasted image 20260517111610.png]]
 
 但这种“优美”的数学性质并不是我们希望其保留下来的，最简单的例子是：
 
@@ -61,7 +61,7 @@ $$
 
 [《Transformer Language Models without Positional Encodings Still Learn Positional Information》](https://papers.cool/arxiv/2203.16634)这篇论文做了相关的实验，他们利用探针检测了随层数变化，每个 token 的 hidden state 隐含位置信息的误差：
 
- ![[content/posts/位置编码（一）：为什么需要位置编码/images/Pasted image 20260517140903.png]]
+ ![[Pasted image 20260517140903.png]]
  
  NoPE的模型在前几层一开始没有位置信息，但在大约 4 层内误差快速下降，即这一过程中模型借助因果掩码逐步学到了位置信息，而后期所有的位置编码误差都上升了，这与[《The Bottom-up Evolution of Representations in the Transformer: A Study with Machine Translation and Language Modeling Objectives》](https://papers.cool/arxiv/1909.01380)中揭示的现象也一致：到了深层，模型已经提取了高度抽象的语义信息，关注前面词的精确位置对于预测下一个词不再有直接的帮助，因此“遗忘”了这些信息。
 
