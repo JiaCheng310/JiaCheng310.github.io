@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "ba2fb7d773230bf3",
+        "id": "f4aa7f82bec9afda",
         "type": "tabs",
         "children": [
           {
-            "id": "6c7741f5d87d7751",
+            "id": "c878aa7d341042a0",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "content/posts/位置编码（一）：Sinusoidal/index.md",
+                "file": "content/posts/位置编码（二）：Sinusoidal/index.md",
                 "mode": "source",
                 "source": false
               },
@@ -183,8 +183,21 @@
       "bases:新建数据库": false
     }
   },
-  "active": "6c7741f5d87d7751",
+  "active": "c878aa7d341042a0",
   "lastOpenFiles": [
+    "content/posts/位置编码（二）：Sinusoidal/images/plot3.jpg",
+    "content/posts/位置编码（二）：Sinusoidal/images/Pasted image 20260520163308.png",
+    "content/posts/位置编码（二）：Sinusoidal/images/Pasted image 20260520160004.png",
+    "content/posts/位置编码（二）：Sinusoidal/images/Pasted image 20260519155004.png",
+    "content/posts/位置编码（二）：Sinusoidal/images",
+    "().md",
+    "content/posts/位置编码（二）：Sinusoidal/index.md",
+    "content/posts/位置编码（一）：为什么需要位置编码/index.md",
+    "content/posts/位置编码（二）：Sinusoidal/images/Pasted image 20260517140903.png",
+    "content/posts/位置编码（二）：Sinusoidal/images/Pasted image 20260517111610.png",
+    "content/posts/位置编码（二）：Sinusoidal/images/Pasted image 20260517140825.png",
+    "content/posts/位置编码（二）：Sinusoidal/images/Pasted image 20260517140848.png",
+    "content/posts/位置编码（二）：Sinusoidal",
     "public/posts/index.xml",
     "public/index.xml",
     "public/index.json",
@@ -193,24 +206,13 @@
     "public/posts/positional-encoding-sinusoidal-1/index.html",
     "public/about/index.html",
     "public/about",
-    "public/tags/notes/page/1/index.html",
-    "public/tags/#位置编码/page/1/index.html",
-    "public/tags/#bert/page/1/index.html",
     "public/posts/positional-encoding-sinusoidal-1/images/Pasted image 20260517140848.png",
     "public/posts/positional-encoding-sinusoidal-1/images/Pasted image 20260517140903.png",
     "public/posts/positional-encoding-sinusoidal-1/images/Pasted image 20260517140825.png",
-    "public/posts/positional-encoding-sinusoidal-1/images/Pasted image 20260517111610.png",
-    "public/favicon.svg",
     "content/posts/我的第一篇博客.md",
     "content/_index.md",
-    "content/posts/位置编码（一）：Sinusoidal/index.md",
-    "content/posts/位置编码（一）：Sinusoidal/images/Pasted image 20260517140903.png",
-    "content/posts/位置编码（一）：Sinusoidal/images/Pasted image 20260517140848.png",
-    "content/posts/位置编码（一）：Sinusoidal/images/Pasted image 20260517140825.png",
     "content/about.md",
     "content/posts/位置编码（一）：Sinusoidal/位置编码（一）：Sinusoidal.md",
-    "public/posts/位置编码（一）：Sinusoidal/images/Pasted image 20260517111610.png",
-    "content/posts/位置编码（一）：Sinusoidal/images/Pasted image 20260517111610.png",
     "content/posts/位置编码：Sinusoidal/未命名.md",
     "obsidian/blog-post-template 1.md",
     "content/archives.md",
