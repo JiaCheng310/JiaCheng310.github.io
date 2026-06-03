@@ -61,10 +61,23 @@ heroImage: './cover.png'
 ![[photo.png]]
 ```
 
-也支持带说明文字的形式：
+如果你只是想快速插图，这是最省事的方式。图片会在 Obsidian 和博客中默认居中显示。
+
+如果你想给图片加说明，建议优先用标准 Markdown 图片，并把说明写在标题位置：
 
 ```md
-![[photo.png|图片说明]]
+![图像替代文本](./images/photo.png "这里是图片说明")
+```
+
+博客发布后，这会渲染成带 `figcaption` 的图片。
+
+如果你更想在 Obsidian 里所见即所得，也可以直接写 HTML：
+
+```html
+<figure>
+  <img src="./images/photo.png" alt="图像替代文本" />
+  <figcaption>这里是图片说明</figcaption>
+</figure>
 ```
 
 你当前的 Obsidian 已经配置成把粘贴图片默认保存到文章目录下的 `images/` 文件夹，所以像下面这种写法会自动兼容：

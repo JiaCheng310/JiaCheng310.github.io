@@ -1,5 +1,8 @@
 {
   "alwaysUpdateLinks": true,
   "attachmentFolderPath": ".//images",
-  "promptDelete": false
+  "promptDelete": false,
+  "cssSnippets": [
+    "blog-images"
+  ]
 }

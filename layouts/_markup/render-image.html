@@ -14,9 +14,22 @@
   {{- end -}}
 {{- end -}}
 {{- $attributes := merge .Attributes (dict "alt" .Text "src" $src "title" (.Title | transform.HTMLEscape) "loading" "lazy") -}}
+{{- $caption := .Title | default "" -}}
+{{- if $caption -}}
+<figure>
+  <img
+    {{- range $k, $v := $attributes -}}
+      {{- if $v -}}
+        {{- printf " %s=%q" $k $v | safeHTMLAttr -}}
+      {{- end -}}
+    {{- end -}}>
+  <figcaption>{{ $caption }}</figcaption>
+</figure>
+{{- else -}}
 <img
   {{- range $k, $v := $attributes -}}
     {{- if $v -}}
       {{- printf " %s=%q" $k $v | safeHTMLAttr -}}
     {{- end -}}
   {{- end -}}>
+{{- end -}}

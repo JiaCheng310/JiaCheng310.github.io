@@ -133,14 +133,64 @@ $$
 
 而其中 $T_n$ 是只与相对距离 $n$ (常数)有关的矩阵，因此 $p_{k+n}$ 可以被 $p_k$ 线性表示，从而在注意力点积的计算中，模型可以捕捉到位置之间的相对距离关系。
 
+具体而言，Sinusoidal 位置编码会直接加到 token embedding上：
+
+$$
+x_k = e_k+p_k
+$$
+之后送入注意力模块计算：
+
+$$
+q_k = W_Qx_k \quad k_j = W_Kx_j
+$$
+得到：
+
+$$
+\begin{aligned}
+q_k^\top k_j &= (W_Qx_k)^\top(W_Kx_j)\\
+&= (W_Q(e_k+p_k))^\top(W_K(e_j+p_j))\\
+&= e_k^\top W_Q^\top W_Ke_j + e_k^\top W_Q^\top W_Kp_j + p_k^\top W_Q^\top W_Ke_j+p_k^\top W_Q^\top W_Kp_j
+\end{aligned}
+$$
+
+一般地，我们可以假设 $j = k+n$ ，由于 $p_j = T_np_k$ ，此时的点积分数里就带上了相对位置 $n$ 的信息。
+
+
 不过这种先介绍正弦再讲为什么会有余弦的说法有点事后找补，更直接的思考是从苏神博客[《Transformer升级之路：1、Sinusoidal位置编码追根溯源》](https://kexue.fm/archives/8231)中看来的：
 
+假设模型为 $f(\cdots,x_m,\cdots,x_n,\cdots)$，正如我们上一节所提到的，我们希望破坏双向注意力机制的对称性，从而要加上位置编码：
 
+$$
+\tilde{f}(\cdots,\boldsymbol{x}_m,\cdots,\boldsymbol{x}_n,\cdots)  
+=  
+f(\cdots,\boldsymbol{x}_m+\boldsymbol{p}_m,\cdots,  
+\boldsymbol{x}_n+\boldsymbol{p}_n,\cdots)
+$$
 
+泰勒展开后可以得到：
 
+$$
+\tilde{f}  
+\approx  
+f  
++  
+\boldsymbol{p}_m^{\top}\frac{\partial f}{\partial \boldsymbol{x}_m}  
++  
+\boldsymbol{p}_n^{\top}\frac{\partial f}{\partial \boldsymbol{x}_n}  
++  
+\frac{1}{2}\boldsymbol{p}_m^{\top}  
+\frac{\partial^2 f}{\partial \boldsymbol{x}_m^2}  
+\boldsymbol{p}_m  
++  
+\frac{1}{2}\boldsymbol{p}_n^{\top}  
+\frac{\partial^2 f}{\partial \boldsymbol{x}_n^2}  
+\boldsymbol{p}_n
+$$
 
-
-
+将最后一项记为 $\boldsymbol{p}_n^{\top}\mathcal{H} \boldsymbol{p}_n$ ，不妨先考虑最简单的情况 $\mathcal{H} = I$。此时我们有 $\boldsymbol{p}_n^{\top}\mathcal{H} \boldsymbol{p}_n = \boldsymbol{p}_n^{\top}\boldsymbol{p}_n = \left\langle \boldsymbol{p}_m,\boldsymbol{p}_n \right\rangle$ ，而我们希望这个内积蕴含着相对位置信息，即存在一个函数 $g$：
+$$
+\left\langle \boldsymbol{p}_m,\boldsymbol{p}_n \right\rangle = g(n-m)
+$$
 
 
 # 10000从何而来

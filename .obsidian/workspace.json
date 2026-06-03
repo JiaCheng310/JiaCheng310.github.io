@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "content/posts/位置编码（二）：Sinusoidal/index.md",
+                "file": "content/posts/数字图像第一次大作业/index.md",
                 "mode": "source",
                 "source": false
               },
@@ -53,7 +53,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "tag:BERT",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -78,7 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 200
   },
   "right": {
     "id": "1a72cbb1fff08db5",
@@ -185,18 +185,28 @@
   },
   "active": "c878aa7d341042a0",
   "lastOpenFiles": [
+    "content/posts/数字图像第一次大作业/images/Pasted image 20260603212529.png",
+    "content/posts/位置编码（二）：Sinusoidal/index.md",
+    "content/posts/位置编码（一）：为什么需要位置编码/index.md",
+    "content/posts/数字图像第一次大作业/index.md",
+    "content/posts/数字图像第一次大作业/images/Pasted image 20260603210610.png",
+    "content/posts/我的第一篇博客.md",
+    "2026-05-16.md",
+    "content/posts/数字图像第一次大作业/images/demo.png",
+    "content/posts/数字图像第一次大作业/images/demo_副本.png",
+    "content/posts/数字图像第一次大作业/images/Pasted image 20260527163234.png",
+    "content/posts/数字图像第一次大作业/images",
+    "content/posts/未命名/未命名.md",
+    "content/posts/数字图像第一次大作业",
+    "content/posts/未命名.md",
     "content/posts/位置编码（二）：Sinusoidal/images/plot3.jpg",
     "content/posts/位置编码（二）：Sinusoidal/images/Pasted image 20260520163308.png",
     "content/posts/位置编码（二）：Sinusoidal/images/Pasted image 20260520160004.png",
     "content/posts/位置编码（二）：Sinusoidal/images/Pasted image 20260519155004.png",
     "content/posts/位置编码（二）：Sinusoidal/images",
     "().md",
-    "content/posts/位置编码（二）：Sinusoidal/index.md",
-    "content/posts/位置编码（一）：为什么需要位置编码/index.md",
     "content/posts/位置编码（二）：Sinusoidal/images/Pasted image 20260517140903.png",
     "content/posts/位置编码（二）：Sinusoidal/images/Pasted image 20260517111610.png",
-    "content/posts/位置编码（二）：Sinusoidal/images/Pasted image 20260517140825.png",
-    "content/posts/位置编码（二）：Sinusoidal/images/Pasted image 20260517140848.png",
     "content/posts/位置编码（二）：Sinusoidal",
     "public/posts/index.xml",
     "public/index.xml",
@@ -204,12 +214,6 @@
     "public/search/index.html",
     "public/search",
     "public/posts/positional-encoding-sinusoidal-1/index.html",
-    "public/about/index.html",
-    "public/about",
-    "public/posts/positional-encoding-sinusoidal-1/images/Pasted image 20260517140848.png",
-    "public/posts/positional-encoding-sinusoidal-1/images/Pasted image 20260517140903.png",
-    "public/posts/positional-encoding-sinusoidal-1/images/Pasted image 20260517140825.png",
-    "content/posts/我的第一篇博客.md",
     "content/_index.md",
     "content/about.md",
     "content/posts/位置编码（一）：Sinusoidal/位置编码（一）：Sinusoidal.md",
