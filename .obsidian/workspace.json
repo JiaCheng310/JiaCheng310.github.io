@@ -20,6 +20,26 @@
               "icon": "lucide-file",
               "title": "index"
             }
+          },
+          {
+            "id": "fbadd17e8b61cbfc",
+            "type": "leaf",
+            "state": {
+              "type": "empty",
+              "state": {},
+              "icon": "lucide-file",
+              "title": "新标签页"
+            }
+          },
+          {
+            "id": "5fc2e676e5f501f5",
+            "type": "leaf",
+            "state": {
+              "type": "empty",
+              "state": {},
+              "icon": "lucide-file",
+              "title": "新标签页"
+            }
           }
         ]
       }
@@ -185,13 +205,22 @@
   },
   "active": "c878aa7d341042a0",
   "lastOpenFiles": [
-    "content/posts/数字图像第一次大作业/images/Pasted image 20260603212529.png",
-    "content/posts/位置编码（二）：Sinusoidal/index.md",
-    "content/posts/位置编码（一）：为什么需要位置编码/index.md",
     "content/posts/数字图像第一次大作业/index.md",
+    "content/posts/位置编码（一）：为什么需要位置编码/index.md",
+    "2026-05-16.md",
+    "obsidian/blog-post-template 1.md",
+    "static/favicon.svg",
+    "().md",
+    "README.md",
+    "OBSIDIAN.md",
+    "content/archives.md",
+    "content/about.md",
+    "content/_index.md",
+    "content/posts/数字图像第一次大作业/images/Pasted image 20260603212529.png",
+    "content/search.md",
+    "content/posts/位置编码（二）：Sinusoidal/index.md",
     "content/posts/数字图像第一次大作业/images/Pasted image 20260603210610.png",
     "content/posts/我的第一篇博客.md",
-    "2026-05-16.md",
     "content/posts/数字图像第一次大作业/images/demo.png",
     "content/posts/数字图像第一次大作业/images/demo_副本.png",
     "content/posts/数字图像第一次大作业/images/Pasted image 20260527163234.png",
@@ -204,9 +233,6 @@
     "content/posts/位置编码（二）：Sinusoidal/images/Pasted image 20260520160004.png",
     "content/posts/位置编码（二）：Sinusoidal/images/Pasted image 20260519155004.png",
     "content/posts/位置编码（二）：Sinusoidal/images",
-    "().md",
-    "content/posts/位置编码（二）：Sinusoidal/images/Pasted image 20260517140903.png",
-    "content/posts/位置编码（二）：Sinusoidal/images/Pasted image 20260517111610.png",
     "content/posts/位置编码（二）：Sinusoidal",
     "public/posts/index.xml",
     "public/index.xml",
@@ -214,13 +240,8 @@
     "public/search/index.html",
     "public/search",
     "public/posts/positional-encoding-sinusoidal-1/index.html",
-    "content/_index.md",
-    "content/about.md",
     "content/posts/位置编码（一）：Sinusoidal/位置编码（一）：Sinusoidal.md",
     "content/posts/位置编码：Sinusoidal/未命名.md",
-    "obsidian/blog-post-template 1.md",
-    "content/archives.md",
-    "content/search.md",
     "themes/hugo-PaperMod/README.md",
     "themes/PaperMod/README.md",
     "src/content/blog/我的第一篇博客.md",
@@ -228,8 +249,6 @@
     "src/content/blog/未命名.md",
     "src/content/blog/third-post.md",
     "src/content/blog/second-post.md",
-    "src/content/blog/markdown-style-guide.md",
-    "src/content/blog/first-post.md",
-    "OBSIDIAN.md"
+    "src/content/blog/markdown-style-guide.md"
   ]
 }

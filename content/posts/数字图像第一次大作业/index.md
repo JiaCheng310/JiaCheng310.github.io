@@ -1,7 +1,7 @@
 ---
 title: 几种常见的优化器
 description:
-date: 2026-05-16
+date: 2026-06-02
 slug:
 tags:
   - 优化器
@@ -192,3 +192,32 @@ $$
 \end{aligned}
 $$
 
+
+
+## AdamW
+
+**AdamW**在2017年被提出，旨在改善Adam优化器中权重衰减与梯度更新耦合的问题，具体而言，我们通常会在损失函数中加入$L_2$ 正则化：
+
+$$
+\mathcal{L}(\theta) = \frac{1}{N} \sum_{i=1}^N \ell\big(y_i, f_\theta(x_i)\big)+\frac{\lambda}{2}\|\theta\|_2^2
+$$
+从而求出来的 $g_t$ 变为：
+$$
+g_t = \nabla_{\theta}\mathcal{L}(\theta_t) + \lambda\theta
+$$
+
+因此在Adam的更新过程中，$\lambda \theta$ 这一正则项也会被 $\sqrt{\hat{v_t}}+\epsilon$ 缩放，出现了如下问题：
+
+- 权重衰减受自适应学习率的影响，不同参数的衰减强度不同，导致调参麻烦
+- 泛化性能一般
+
+**AdamW**在此基础上把正则项和梯度更新分开了，取得了更好的效果：
+
+$$
+\begin{aligned}
+&g_t = \nabla_\theta\mathcal{L}(\theta_t)\\~\\
+&m_{t} = \beta_1m_{t-1} + (1-\beta_1)g_{t},\quad v_{t} = \beta_2v_{t-1} + (1-\beta_2)(g_{t}\odot g_{t})\\~\\
+&\hat{m_t} = \frac{m_t}{1-\beta_1^t},\quad \hat{v_t} = \frac{v_t}{1-\beta_2^t}\\~\\
+&\theta_{t+1} = \theta_t - \frac{\eta}{\sqrt{\hat{v_t}}+\epsilon}\hat{m_t}-\eta\lambda\theta_t
+\end{aligned}
+$$

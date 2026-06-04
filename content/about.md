@@ -11,6 +11,4 @@ ShowBreadcrumbs: false
 
 这是张家铖的个人博客。
 
-这里会记录技术学习、项目实践、写作尝试，以及一些值得认真保留下来的想法。
-
 你也可以在 GitHub 上找到我： [JiaCheng310](https://github.com/JiaCheng310)
