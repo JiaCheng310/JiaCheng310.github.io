@@ -13,7 +13,17 @@
     {{- end -}}
   {{- end -}}
 {{- end -}}
-{{- $attributes := merge .Attributes (dict "alt" .Text "src" $src "title" (.Title | transform.HTMLEscape) "loading" "lazy") -}}
+{{- $alt := .Text -}}
+{{- $sizeAttrs := dict -}}
+{{- if findRE `^\d+$` .Text -}}
+  {{- $sizeAttrs = dict "width" .Text -}}
+  {{- $alt = "" -}}
+{{- else if findRE `^\d+x\d+$` .Text -}}
+  {{- $size := split .Text "x" -}}
+  {{- $sizeAttrs = dict "width" (index $size 0) "height" (index $size 1) -}}
+  {{- $alt = "" -}}
+{{- end -}}
+{{- $attributes := merge .Attributes $sizeAttrs (dict "alt" $alt "src" $src "title" (.Title | transform.HTMLEscape) "loading" "lazy") -}}
 {{- $caption := .Title | default "" -}}
 {{- if $caption -}}
 <figure>

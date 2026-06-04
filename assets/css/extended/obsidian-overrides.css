@@ -9,7 +9,7 @@
   --article-quote-border: #94a3b8;
 }
 
-.dark {
+:root[data-theme="dark"] {
   --article-text: #e6edf3;
   --article-muted: #9da7b3;
   --article-border: rgba(230, 237, 243, 0.14);
@@ -37,6 +37,13 @@
   color: var(--article-muted);
   font-size: 1rem;
   line-height: 1.8;
+}
+
+.post-meta,
+.post-footer,
+.post-tags,
+.breadcrumbs {
+  color: var(--article-muted);
 }
 
 .post-content {
@@ -91,6 +98,10 @@
   text-underline-offset: 0.15em;
 }
 
+:root[data-theme="dark"] .post-content a {
+  color: #8ab4ff;
+}
+
 .post-content strong {
   color: var(--article-accent);
 }
@@ -115,6 +126,7 @@
   border-inline-start: 4px solid var(--article-quote-border);
   border-radius: 0 12px 12px 0;
   background: var(--article-quote);
+  color: var(--article-text);
 }
 
 .post-content blockquote p:last-child {
@@ -160,12 +172,20 @@
   font-weight: 600;
 }
 
+:root[data-theme="dark"] .post-content tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.025);
+}
+
 .post-content img {
   display: block;
   max-width: min(100%, 860px);
   margin: 2rem auto;
   border-radius: 14px;
   box-shadow: 0 18px 44px rgba(15, 23, 42, 0.08);
+}
+
+:root[data-theme="dark"] .post-content img {
+  box-shadow: none;
 }
 
 .post-content figure {
@@ -196,6 +216,7 @@
   border: 1px solid var(--article-border);
   border-radius: 14px;
   background: var(--article-surface);
+  color: var(--article-text);
 }
 
 .toc summary {
