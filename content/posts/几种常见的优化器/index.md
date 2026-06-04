@@ -1,6 +1,6 @@
 ---
 title: 几种常见的优化器
-description:
+description: 介绍SGD、Momentum、RMSProp和Adam以及AdamW
 date: 2026-06-02
 slug:
 tags:
