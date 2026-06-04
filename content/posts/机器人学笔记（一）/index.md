@@ -28,7 +28,7 @@ $$
 $$
  c(x_k+\Delta x_k) \approx c(x_k) + c^\prime(x_k)\Delta x_k
 $$
-![[Pasted image 20260604155608.png|300]]
+![[Pasted image 20260604155608.png|250]]
 
 如图所示，此处的 $c^\prime(x_k)$ 为正数，沿着这个方向的 $c(x)$ 有增长的趋势。但我们的目标是让其最小化，因此 $x_k$ 走的方向应当和 $c^\prime(x)$ 的方向相反，那么 $\Delta x_k$ 的一个选择是：
 $$
@@ -54,7 +54,7 @@ $$
 $$
 c(x_k+\Delta x_k) \approx c(x_k) + c^\prime(x_k)\Delta x_k + \frac{1}{2}c^{\prime\prime}(x_k)\Delta x^2_k
 $$
-![[Pasted image 20260604163902.png | 400]]
+![[Pasted image 20260604163902.png | 250]]
 
 
 观测右式，我们利用了二次函数在局部近似代价函数 $c(x)$ ，如果 $c^{\prime\prime}(x_k)>0$ ，则这个局部二次函数是下凸的，有极小值。 一个直观的想法是：局部二次函数的极小值可以作为原函数极小值的猜测。
@@ -74,7 +74,7 @@ $$
 
 然而，假如 $c^{\prime\prime}(x_k) \leq 0$  ，我们该怎么更新呢：
 
-![[Pasted image 20260604195838.png|300]]
+![[Pasted image 20260604195838.png|250]]
 
 此时我们没法再直接用上述的牛顿法更新，以图中 $c^{\prime\prime}(x_k)<0$ 为例，局部二次函数的开口向下，还用上述的方法更新只会让代价函数更大，因此实际操作中，会将 $c^{\prime\prime}(x_k)$ 替换成一个很小的正数，从而保证我们的更新是可信的。
 
@@ -183,8 +183,9 @@ $$
 $$
 从而可以求得：
 $$
-x = (A^\top A)^{-1}A^\top b
+x = (A^\top A)^{-1}A^\top b = A^\dagger b
 $$
+
 
 
 
