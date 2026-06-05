@@ -192,4 +192,5 @@ $$
 x = (A^\top A)^{-1}A^\top b = A^\dagger b
 $$
 
+![[fk_3link.gif|500]]
 

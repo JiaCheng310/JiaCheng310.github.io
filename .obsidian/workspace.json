@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "content/posts/机器人学笔记（一）/index.md",
+                "file": "content/posts/机器人学笔记（二）：正运动学/index.md",
                 "mode": "source",
                 "source": false
               },
@@ -203,10 +203,21 @@
       "bases:新建数据库": false
     }
   },
-  "active": "c878aa7d341042a0",
+  "active": "6d89cdd428c79bbb",
   "lastOpenFiles": [
-    "content/posts/几种常见的优化器/index.md",
+    "content/posts/机器人学笔记（二）：正运动学/images/fk_3link.gif",
+    "content/posts/机器人学笔记（二）：正运动学/index.md",
+    "content/posts/机器人学笔记（二）：正运动学/images/Pasted image 20260605134141.png",
+    "content/posts/机器人学笔记（二）：正运动学/images/Pasted image 20260605133548.png",
+    "content/posts/机器人学笔记（二）：正运动学/images",
+    "2026-06-04.md",
     "content/posts/机器人学笔记（一）/index.md",
+    "index 1.md",
+    "index.md",
+    "content/posts/机器人学笔记（二）：正运动学",
+    "content/posts/我的第一篇博客.md",
+    "content/posts/未命名.md",
+    "content/posts/几种常见的优化器/index.md",
     "2026-06-02.md",
     "content/posts/机器人学笔记（一）/images/Pasted image 20260604195838.png",
     "content/posts/机器人学笔记（一）/images/Pasted image 20260604195401.png",
@@ -217,7 +228,6 @@
     "content/posts/几种常见的优化器/images",
     "content/posts/几种常见的优化器",
     "content/posts/机器人学笔记（一）/images/Pasted image 20260604155608.png",
-    "content/posts/机器人学笔记（一）/images/Pasted image 20260604155554.png",
     "content/posts/机器人学笔记（一）/images",
     "OBSIDIAN.md",
     "content/posts/机器人学笔记（一）",
@@ -226,30 +236,19 @@
     "content/posts/位置编码（一）：为什么需要位置编码/index.md",
     "2026-05-16.md",
     "obsidian/blog-post-template 1.md",
-    "static/favicon.svg",
     "().md",
     "content/archives.md",
     "content/_index.md",
-    "content/posts/几种常见的优化器/images/Pasted image 20260603212529.png",
     "content/search.md",
     "content/posts/位置编码（二）：Sinusoidal/index.md",
-    "content/posts/我的第一篇博客.md",
     "content/posts/几种常见的优化器/images",
     "content/posts/未命名/未命名.md",
     "content/posts/几种常见的优化器",
-    "content/posts/未命名.md",
     "content/posts/位置编码（二）：Sinusoidal/images",
     "content/posts/位置编码（二）：Sinusoidal",
-    "public/posts/index.xml",
-    "public/index.xml",
     "content/posts/位置编码（一）：Sinusoidal/位置编码（一）：Sinusoidal.md",
     "content/posts/位置编码：Sinusoidal/未命名.md",
     "themes/hugo-PaperMod/README.md",
-    "themes/PaperMod/README.md",
-    "src/content/blog/我的第一篇博客.md",
-    "archetypes/default.md",
-    "src/content/blog/未命名.md",
-    "src/content/blog/third-post.md",
-    "src/content/blog/second-post.md"
+    "themes/PaperMod/README.md"
   ]
 }
