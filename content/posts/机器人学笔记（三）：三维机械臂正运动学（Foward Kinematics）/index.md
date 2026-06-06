@@ -1,7 +1,7 @@
 ---
 title: 机器人学笔记（三）：3D机械臂正运动学（Foward Kinematics）
 description: 介绍三维机械臂的正运动学
-date: 2026-06-04
+date: 2026-06-05
 slug:
 tags:
   - 机器人学
@@ -65,7 +65,7 @@ math: true
 -  $\hat{X}$ 轴的方向是相邻两根轴线的公垂线 $a_{i}$ 方向，一般指向下一个关节
 -  $\hat{Y}$ 轴的方向是通过 $\hat{Z}$ 轴与 $\hat{X}$ 轴的右手定则确立的
 
-当两根轴线共面，此时 $a_i=0$，一般取垂直于该平面的法线为 $\hat{X}$ 轴
+当两根轴线相交，此时 $a_i=0$，一般取垂直于该平面的法线为 $\hat{X}$ 轴
 
 
 ### 连杆长度 $a_{i-1}$
@@ -86,7 +86,7 @@ math: true
 
 ### 关节角 $\theta_i$
 
-第 $i$ 根连杆的偏距 $d_i$ 定义为上一根连杆的 $\hat{X}_{i-1}$ 轴到绕 $\hat{Z}_i$ 轴旋转到当前连杆的 $\hat{X}_{i}$ 轴的角度，方向遵循右手定则。
+第 $i$ 根连杆的关节角 $\theta_i$ 定义为上一根连杆的 $\hat{X}_{i-1}$ 轴到绕 $\hat{Z}_i$ 轴旋转到当前连杆的 $\hat{X}_{i}$ 轴的角度，方向遵循右手定则。
 
 ### 一般约定
 
@@ -154,17 +154,104 @@ $$
 
 这和我们直观得到的是一致的，其他杆的末端位置同理也可以求得
 
+我们可以用一种更简便的写法来表示上述的旋转和平移变换，定义一个矩阵 ${}^{0}_{1}T$，它表示$\{1\}$相对于 $\{0\}$ 的位姿：
+
+$$
+{}^{0}_{1}T= \begin{bmatrix}
+\cos \theta_1 &-\sin \theta_1 &a_1\cos\theta_1\\
+\sin\theta_1 & \cos \theta_1& a_1\sin\theta_1\\
+0&0&1
+\end{bmatrix}
+$$
+同理有 $\{2\}$ 相对于 $\{1\}$：
+$$
+{}^{1}_{2}T= \begin{bmatrix}
+\cos \theta_2 &-\sin \theta_2 &a_2\cos\theta_2\\
+\sin\theta_2 & \cos \theta_2& a_2\sin\theta_2\\
+0&0&1
+\end{bmatrix}
+$$
+
+则 $\{2\}$ 相对于 $\{0\}$的位姿是二者的连乘：
+
+$$
+{}^{0}_{2}T = {}^{0}_{1}T {}^{1}_{2}T = 
+\begin{bmatrix}
+\cos (\theta_1+\theta_2) &-\sin (\theta_1+\theta_2) &a_1\cos\theta_1+a_2\cos(\theta_1+\theta_2)\\
+\sin(\theta_1+\theta_2) & \cos (\theta_1+\theta_2)& a_1\sin\theta_1+a_2\sin(\theta_1+\theta_2)\\
+0&0&1
+\end{bmatrix}
+$$
+
+这个矩阵定义的好处在于，我们可以通过不断连乘来得到每根杆坐标系相对于基座坐标系的位姿
+
 
 ### 三维机械臂
 
 上述的例子给了我们一个启发，可以通过旋转和平移坐标系来求解末端位置。只是三维的情况更复杂一点，回忆
 $$
-(a_{i-1},\alpha_{i-1},d_i,\theta_i)
+(\alpha_{i-1},a_{i-1},\theta_i,d_i)
 $$
 实际上它们就是**坐标系 $\{i-1\}$ 变换到坐标系 $\{i\}$ 所需要的四个子运动**：
 
-- $a_{i-1}$ 是 $\hat{Z}_{i-1}$  沿着 $\hat{X}_{i-1}$ 平移到 $\hat{Z}_{i}$ 的距离
 - $\alpha_{i-1}$ 是 $\hat{Z}_{i-1}$  绕着 $\hat{X}_{i-1}$ 旋转到 $\hat{Z}_{i}$ 的角度
-- $d_i$ 是$\hat{X}_{i-1}$  沿着 $\hat{Z}_{i}$ 平移到 $\hat{X}_{i}$ 的距离
-- $\theta_i$ 是$\hat{X}_{i-1}$  绕着 $\hat{Z}_{i}$ 旋转到 $\hat{X}_{i}$ 的角度
+- $a_{i-1}$ 是 $\hat{Z}_{i-1}$  沿着 $\hat{X}_{i-1}$ 平移到 $\hat{Z}_{i}$ 的距离
+- $\theta_i$ 是 $\hat{X}_{i-1}$  绕着 $\hat{Z}_{i}$ 旋转到 $\hat{X}_{i}$ 的角度
+- $d_i$ 是 $\hat{X}_{i-1}$  沿着 $\hat{Z}_{i}$ 平移到 $\hat{X}_{i}$ 的距离
 
+
+因此我们可以定义四个矩阵，它们分别代表这四个子运动：
+
+$$
+\begin{aligned}
+R_x(\alpha) &=
+\begin{bmatrix}
+1& 0&0&0\\
+0&\cos\alpha &-\sin\alpha&0\\
+0&\sin\alpha&\cos\alpha&0\\
+0&0&0&1
+\end{bmatrix}
+\qquad
+T_x(a) = \begin{bmatrix}
+1& 0&0&a\\
+0&1&0&0\\
+0&0&1&0\\
+0&0&0&1
+\end{bmatrix}
+\\~\\
+R_z(\theta) &=
+\begin{bmatrix}
+\cos\theta &-\sin\theta&0&0\\
+\sin\theta&\cos\theta&0&0\\
+0& 0&1&0\\
+0&0&0&1
+\end{bmatrix}
+\qquad
+T_z(d) = \begin{bmatrix}
+1& 0&0&0\\
+0&1&0&0\\
+0&0&1&d\\
+0&0&0&1
+\end{bmatrix}
+\end{aligned}
+$$
+
+因此从坐标系 $\{i\}$ 相对于 $\{i-1\}$ 的位姿可以定义为一个矩阵：
+
+$$
+\begin{aligned}
+{}^{i-1}_{i}T &= R(\alpha_{i-1})T_x(a_{i-1})R_z(\theta_i)T_z(d_i)\\~\\
+&=\begin{bmatrix}
+\cos\theta_i & -\sin\theta_i & 0 & a_{i-1}\\
+\cos\alpha_{i-1}\sin\theta_i & \cos\alpha_{i-1}\cos\theta_i & -\sin\alpha_{i-1} & -d_i\sin\alpha_{i-1}\\
+\sin\alpha_{i-1}\sin\theta_i & \sin\alpha_{i-1}\cos\theta_i & \cos\alpha_{i-1} & d_i\cos\alpha_{i-1}\\
+0&0&0&1
+\end{bmatrix}
+\end{aligned}
+$$
+
+进而我们可以通过连乘，直接求得：
+
+$$
+{}^{0}_{n}T = {}^{0}_{1}T{}^{1}_{2}T\cdots{}^{n-1}_{n}T
+$$
