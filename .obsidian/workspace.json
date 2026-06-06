@@ -98,7 +98,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 200
+    "width": 350.5
   },
   "right": {
     "id": "1a72cbb1fff08db5",
@@ -203,8 +203,9 @@
       "bases:新建数据库": false
     }
   },
-  "active": "c878aa7d341042a0",
+  "active": "6d89cdd428c79bbb",
   "lastOpenFiles": [
+    "content/posts/机器人学笔记（四）：逆运动学（Inverse Kinematics）",
     "content/posts/机器人学笔记（二）：二维机械臂正运动学/index.md",
     "content/posts/机器人学笔记（三）：三维机械臂正运动学（Foward Kinematics）/index.md",
     "content/posts/机器人学笔记（三）：三维机械臂正运动学（Foward Kinematics）/images/Pasted image 20260605174053.png",

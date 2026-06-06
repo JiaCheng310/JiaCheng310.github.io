@@ -41,7 +41,7 @@ params:
 
   defaultTheme: auto
   ShowShareButtons: false
-  ShowReadingTime: true
+  ShowReadingTime: false
   ShowPostNavLinks: true
   ShowBreadCrumbs: true
   ShowCodeCopyButtons: true
