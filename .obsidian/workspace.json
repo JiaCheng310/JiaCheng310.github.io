@@ -203,11 +203,14 @@
       "bases:新建数据库": false
     }
   },
-  "active": "6d89cdd428c79bbb",
+  "active": "c878aa7d341042a0",
   "lastOpenFiles": [
-    "content/posts/机器人学笔记（四）：逆运动学（Inverse Kinematics）",
     "content/posts/机器人学笔记（二）：二维机械臂正运动学/index.md",
     "content/posts/机器人学笔记（三）：三维机械臂正运动学（Foward Kinematics）/index.md",
+    "content/posts/机器人学笔记（三）：三维机械臂正运动学（Foward Kinematics）/images/piper_demo.gif",
+    "content/posts/机器人学笔记（三）：三维机械臂正运动学（Foward Kinematics）/images/Pasted image 20260606143736.png",
+    "content/posts/机器人学笔记（四）：逆运动学（Inverse Kinematics）/index.md",
+    "content/posts/机器人学笔记（四）：逆运动学（Inverse Kinematics）",
     "content/posts/机器人学笔记（三）：三维机械臂正运动学（Foward Kinematics）/images/Pasted image 20260605174053.png",
     "content/posts/机器人学笔记（三）：三维机械臂正运动学（Foward Kinematics）/images/Pasted image 20260605170649.png",
     "content/posts/机器人学笔记（三）：三维机械臂正运动学（Foward Kinematics）/images/Pasted image 20260605163202.png",
@@ -228,8 +231,6 @@
     "content/posts/未命名.md",
     "content/posts/几种常见的优化器/index.md",
     "2026-06-02.md",
-    "content/posts/机器人学笔记（一）/images/Pasted image 20260604195838.png",
-    "content/posts/机器人学笔记（一）/images/Pasted image 20260604195401.png",
     "content/posts/几种常见的优化器/images",
     "content/posts/几种常见的优化器",
     "content/posts/机器人学笔记（一）/images",
@@ -247,9 +248,7 @@
     "content/posts/位置编码（二）：Sinusoidal/index.md",
     "content/posts/几种常见的优化器/images",
     "content/posts/未命名/未命名.md",
-    "content/posts/几种常见的优化器",
     "content/posts/位置编码（一）：Sinusoidal/位置编码（一）：Sinusoidal.md",
-    "content/posts/位置编码：Sinusoidal/未命名.md",
-    "themes/hugo-PaperMod/README.md"
+    "content/posts/位置编码：Sinusoidal/未命名.md"
   ]
 }

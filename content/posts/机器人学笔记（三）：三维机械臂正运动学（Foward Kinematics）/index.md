@@ -255,3 +255,410 @@ $$
 $$
 {}^{0}_{n}T = {}^{0}_{1}T{}^{1}_{2}T\cdots{}^{n-1}_{n}T
 $$
+
+在mujoco仿真中，我们利用存储的**MjData**即可快速得到坐标：
+
+![[piper_demo.gif]]
+
+此处在原xml文件的基础上增加了site（图中的小蓝点）作为模型的一部分：
+
+```python
+
+import argparse
+
+import math
+
+from pathlib import Path
+
+import time
+
+  
+
+import mujoco
+
+import numpy as np
+
+  
+
+PROJECT_DIR = Path(__file__).resolve().parent
+
+PIPER_SCENE = PROJECT_DIR / "agilex_piper" / "scene.xml"
+
+EE_SITE = "ee_site"
+
+GRIPPER_ACTUATOR = "gripper"
+
+  
+  
+
+TRACE_RGBA = np.array([1.0,0.2,0.0, 1.0], dtype = np.float32)
+
+TRACE_RADIUS = 0.004
+
+MAX_TRACE_POINT = 0
+
+  
+  
+
+def body_ids(model: mujoco.MjModel, names: list[str]) -> list[tuple[str, int]]:
+
+ids = []
+
+for name in names:
+
+body_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, name)
+
+if body_id < 0:
+
+raise ValueError(f"body not found: {name}")
+
+ids.append((name, body_id))
+
+return ids
+
+  
+  
+
+def site_id(model: mujoco.MjModel, name: str) -> int:
+
+site = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SITE, name)
+
+if site < 0:
+
+raise ValueError(f"site not found: {name}")
+
+return site
+
+  
+  
+
+def actuator_id(model: mujoco.MjModel, name: str) -> int:
+
+actuator = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, name)
+
+if actuator < 0:
+
+raise ValueError(f"actuator not found: {name}")
+
+return actuator
+
+  
+  
+
+def reset_home(model: mujoco.MjModel, data: mujoco.MjData) -> None:
+
+key_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_KEY, "home")
+
+if key_id >= 0:
+
+mujoco.mj_resetDataKeyframe(model, data, key_id)
+
+else:
+
+mujoco.mj_resetData(model, data)
+
+  
+
+def draw_trace(viewer, points: list[np.ndarray]) -> None:
+
+if len(points) < 2:
+
+return
+
+  
+
+max_segments = min(len(points) - 1, viewer.user_scn.maxgeom)
+
+  
+
+with viewer.lock():
+
+viewer.user_scn.ngeom = 0
+
+cam = viewer.cam
+
+print(
+
+f"lookat={cam.lookat.copy()}, "
+
+f"distance={cam.distance:.4f}, "
+
+f"azimuth={cam.azimuth:.4f}, "
+
+f"elevation={cam.elevation:.4f}",
+
+flush=True,
+
+)
+
+for i in range(max_segments):
+
+p0 = points[i]
+
+p1 = points[i + 1]
+
+  
+
+geom = viewer.user_scn.geoms[i]
+
+mujoco.mjv_initGeom(
+
+geom,
+
+mujoco.mjtGeom.mjGEOM_CAPSULE,
+
+np.array([TRACE_RADIUS, 0.0, 0.0], dtype=np.float64),
+
+np.zeros(3, dtype=np.float64),
+
+np.eye(3, dtype=np.float64).reshape(9),
+
+TRACE_RGBA,
+
+)
+
+mujoco.mjv_connector(
+
+geom,
+
+mujoco.mjtGeom.mjGEOM_CAPSULE,
+
+TRACE_RADIUS,
+
+p0,
+
+p1,
+
+)
+
+  
+
+viewer.user_scn.ngeom = max_segments
+
+  
+
+def print_positions(
+
+data: mujoco.MjData,
+
+ee_site_id: int,
+
+tracked_bodies: list[tuple[str, int]],
+
+) -> None:
+
+values = []
+
+x, y, z = data.site_xpos[ee_site_id]
+
+values.append(f"{EE_SITE}=({x:.4f}, {y:.4f}, {z:.4f})")
+
+  
+
+for name, body_id in tracked_bodies:
+
+x, y, z = data.xpos[body_id]
+
+values.append(f"{name}=({x:.4f}, {y:.4f}, {z:.4f})")
+
+print(f"t={data.time:6.3f}s | " + " ".join(values), flush=True)
+
+  
+
+def apply_demo_motion(model: mujoco.MjModel, data: mujoco.MjData, home_ctrl) -> None:
+
+t = data.time
+
+data.ctrl[:] = home_ctrl
+
+  
+
+joint1 = actuator_id(model, "joint1")
+
+joint2 = actuator_id(model, "joint2")
+
+joint3 = actuator_id(model, "joint3")
+
+joint4 = actuator_id(model, "joint4")
+
+joint5 = actuator_id(model, "joint5")
+
+gripper = actuator_id(model, GRIPPER_ACTUATOR)
+
+  
+
+data.ctrl[joint1] = home_ctrl[joint1] + math.sin(0.7 * t)
+
+data.ctrl[joint2] = home_ctrl[joint2] + 0.45 * math.sin(0.5 * t)
+
+data.ctrl[joint3] = home_ctrl[joint3] + 0.25 * math.sin(0.8 * t)
+
+data.ctrl[joint4] = home_ctrl[joint4] + 0.45 * math.sin(1.0 * t)
+
+data.ctrl[joint5] = home_ctrl[joint5] + 0.30 * math.sin(0.9 * t)
+
+  
+
+# PiPER gripper is position-controlled through joint7.
+
+# 0.035 is open, 0.0 is closed. joint8 follows joint7 through equality.
+
+data.ctrl[gripper] = 0.0175
+
+  
+
+def run(
+
+headless: bool,
+
+demo: bool,
+
+seconds: float | None,
+
+interval: float,
+
+body_names: list[str],
+
+) -> None:
+
+model = mujoco.MjModel.from_xml_path(str(PIPER_SCENE))
+
+data = mujoco.MjData(model)
+
+reset_home(model, data) # 恢复到home状态
+
+home_ctrl = data.ctrl.copy() # 复制home
+
+tracked_bodies = body_ids(model, body_names)
+
+ee_site_id = site_id(model, EE_SITE)
+
+  
+
+print(f"xml: {PIPER_SCENE}")
+
+print(f"tracking: {EE_SITE} from data.site_xpos")
+
+if body_names:
+
+print(f"extra bodies: {', '.join(body_names)}")
+
+  
+
+next_print_time = 0.0
+
+trace_points:list[np.ndarray] = []
+
+  
+
+if headless:
+
+duration = 5.0 if seconds is None else seconds
+
+while data.time < duration:
+
+if demo:
+
+apply_demo_motion(model, data, home_ctrl)
+
+mujoco.mj_step(model, data)
+
+  
+
+if data.time >= next_print_time:
+
+print_positions(data, ee_site_id, tracked_bodies)
+
+next_print_time += interval
+
+return
+
+  
+
+from mujoco import viewer as mujoco_viewer
+
+  
+
+with mujoco_viewer.launch_passive(model, data) as viewer:
+
+while viewer.is_running() and (seconds is None or data.time < seconds):
+
+step_start = time.time()
+
+  
+
+if demo:
+
+apply_demo_motion(model, data, home_ctrl)
+
+trace_points.append(data.site_xpos[ee_site_id].copy())
+
+mujoco.mj_step(model, data)
+
+if len(trace_points) > MAX_TRACE_POINT:
+
+trace_points.pop(0)
+
+draw_trace(viewer,trace_points)
+
+viewer.sync()
+
+  
+
+if data.time >= next_print_time:
+
+print_positions(data, ee_site_id, tracked_bodies)
+
+next_print_time += interval
+
+  
+
+sleep_time = model.opt.timestep - (time.time() - step_start)
+
+if sleep_time > 0:
+
+time.sleep(sleep_time)
+
+  
+  
+
+def main() -> None:
+
+parser = argparse.ArgumentParser(description="Simulate PiPER and print live body positions")
+
+parser.add_argument("--headless", action="store_true", help="run without viewer")
+
+parser.add_argument("--demo", action="store_true", help="move joints and gripper")
+
+parser.add_argument("--seconds", type=float, default=None, help="simulation duration")
+
+parser.add_argument("--interval", type=float, default=0.2, help="print interval in seconds")
+
+parser.add_argument("--bodies", nargs="*", default=[], help="extra body names to print")
+
+args = parser.parse_args()
+
+  
+
+run(
+
+headless=args.headless,
+
+demo=args.demo,
+
+seconds=args.seconds,
+
+interval=args.interval,
+
+body_names=args.bodies,
+
+)
+
+  
+
+if __name__ == "__main__":
+
+main()
+
+
+```
