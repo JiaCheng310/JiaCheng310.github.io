@@ -134,7 +134,7 @@ $$
 
 因此 $\{3\}$ 相对于基座坐标系逆时针旋转了 $\theta_1+\theta_2+\theta_3$
 
-如果我们可以把坐标系变换回去，在 $\{3\}$ 坐标系下的末端表示就可以变成世界坐标系的表示，也达成了我们最终的目的。
+我们希望把在 $\{3\}$ 坐标系下的末端表示变成世界坐标系的表示
 
 不妨先考虑杆 $1$ 末端位置的转换，由于坐标系 $\{1\}$ 相对世界坐标系逆时针转了 $\theta_1$，把其末端表示逆时针旋转 $\theta_1$ ：
 
@@ -158,16 +158,16 @@ $$
 
 $$
 {}^{0}_{1}T= \begin{bmatrix}
-\cos \theta_1 &-\sin \theta_1 &a_1\cos\theta_1\\
-\sin\theta_1 & \cos \theta_1& a_1\sin\theta_1\\
+\cos \theta_1 &-\sin \theta_1 &a_0\\
+\sin\theta_1 & \cos \theta_1& 0\\
 0&0&1
 \end{bmatrix}
 $$
-同理有 $\{2\}$ 相对于 $\{1\}$：
+注意此时两个坐标系重合，有 $a_0 = 0$，同理有 $\{2\}$ 相对于 $\{1\}$：
 $$
 {}^{1}_{2}T= \begin{bmatrix}
-\cos \theta_2 &-\sin \theta_2 &a_2\cos\theta_2\\
-\sin\theta_2 & \cos \theta_2& a_2\sin\theta_2\\
+\cos \theta_2 &-\sin \theta_2 &a_1\\
+\sin\theta_2 & \cos \theta_2& 0\\
 0&0&1
 \end{bmatrix}
 $$
@@ -177,8 +177,8 @@ $$
 $$
 {}^{0}_{2}T = {}^{0}_{1}T {}^{1}_{2}T = 
 \begin{bmatrix}
-\cos (\theta_1+\theta_2) &-\sin (\theta_1+\theta_2) &a_1\cos\theta_1+a_2\cos(\theta_1+\theta_2)\\
-\sin(\theta_1+\theta_2) & \cos (\theta_1+\theta_2)& a_1\sin\theta_1+a_2\sin(\theta_1+\theta_2)\\
+\cos (\theta_1+\theta_2) &-\sin (\theta_1+\theta_2) &a_1\cos\theta_1\\
+\sin(\theta_1+\theta_2) & \cos (\theta_1+\theta_2)& a_1\sin\theta_1\\
 0&0&1
 \end{bmatrix}
 $$
@@ -240,7 +240,7 @@ $$
 
 $$
 \begin{aligned}
-{}^{i-1}_{i}T &= R(\alpha_{i-1})T_x(a_{i-1})R_z(\theta_i)T_z(d_i)\\~\\
+{}^{i-1}_{i}T &= R_x(\alpha_{i-1})T_x(a_{i-1})R_z(\theta_i)T_z(d_i)\\~\\
 &=\begin{bmatrix}
 \cos\theta_i & -\sin\theta_i & 0 & a_{i-1}\\
 \cos\alpha_{i-1}\sin\theta_i & \cos\alpha_{i-1}\cos\theta_i & -\sin\alpha_{i-1} & -d_i\sin\alpha_{i-1}\\
@@ -256,7 +256,9 @@ $$
 {}^{0}_{n}T = {}^{0}_{1}T{}^{1}_{2}T\cdots{}^{n-1}_{n}T
 $$
 
-在mujoco仿真中，我们利用存储的**MjData**即可快速得到坐标：
+实际计算中，我们往往会用四元数来表示旋转矩阵，从而可以解决欧拉角参数化万向锁的问题。
+
+在mujoco仿真中，利用存储的**MjData**即可快速得到坐标：
 
 ![[piper_demo.gif]]
 
