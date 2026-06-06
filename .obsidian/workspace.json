@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "content/posts/机器人学笔记（三）：三维机械臂正运动学（Foward Kinematics）/index.md",
+                "file": "content/posts/机器人学笔记（四）：逆运动学（Inverse Kinematics）/index.md",
                 "mode": "source",
                 "source": false
               },
@@ -98,8 +98,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 350.5,
-    "collapsed": true
+    "width": 350.5
   },
   "right": {
     "id": "1a72cbb1fff08db5",
@@ -206,8 +205,8 @@
   },
   "active": "c878aa7d341042a0",
   "lastOpenFiles": [
-    "content/posts/机器人学笔记（二）：二维机械臂正运动学/index.md",
     "content/posts/机器人学笔记（三）：三维机械臂正运动学（Foward Kinematics）/index.md",
+    "content/posts/机器人学笔记（二）：二维机械臂正运动学/index.md",
     "content/posts/机器人学笔记（三）：三维机械臂正运动学（Foward Kinematics）/images/piper_demo.gif",
     "content/posts/机器人学笔记（三）：三维机械臂正运动学（Foward Kinematics）/images/Pasted image 20260606143736.png",
     "content/posts/机器人学笔记（四）：逆运动学（Inverse Kinematics）/index.md",
