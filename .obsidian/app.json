@@ -4,5 +4,16 @@
   "promptDelete": false,
   "cssSnippets": [
     "blog-images"
+  ],
+  "userIgnoreFilters": [
+    "static/",
+    "public/",
+    "resources/",
+    "quarto-notes/_site/",
+    "quarto-notes/.quarto/",
+    "quarto-notes/_freeze/",
+    "_legacy-hugo-notes/",
+    ".git/",
+    "node_modules/"
   ]
 }

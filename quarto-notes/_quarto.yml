@@ -1,0 +1,72 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - "*.qmd"
+    - "robotics/*.qmd"
+    - "deep-learning/*.qmd"
+  resources:
+    - "robotics/images/**"
+    - "deep-learning/images/**"
+
+author: Jiacheng Zhang
+date-format: iso
+
+execute:
+  freeze: auto
+
+format:
+  html:
+    theme:
+      - cosmo
+    filters:
+      - filters/obsidian-images.lua
+    grid:
+      sidebar-width: 250px
+      body-width: 850px
+      margin-width: 250px
+    css: styles.css
+    toc: true
+    toc-depth: 3
+    number-sections: false
+    syntax-highlighting: github
+    code-copy: true
+    code-overflow: wrap
+
+website:
+  title: "Jiacheng's Notes"
+  site-url: "https://jiacheng310.github.io/notes/"
+  search: true
+  page-navigation: true
+  navbar:
+    right:
+      - text: Blog
+        href: "https://jiacheng310.github.io/"
+      - text: GitHub
+        href: "https://github.com/JiaCheng310"
+  sidebar:
+    style: floating
+    contents:
+      - text: "首页"
+        href: index.qmd
+      - section: "Part 1: 机器人学"
+        contents:
+          - section: "Chapter 1: 问题建模与优化"
+            contents:
+              - robotics/optimization.qmd
+          - section: "Chapter 2: Forward Kinematics"
+            contents:
+              - robotics/fk-2d.qmd
+              - robotics/fk-3d.qmd
+          - section: "Chapter 3: Inverse Kinematics"
+            contents:
+              - robotics/ik.qmd
+      - section: "Part 2: 深度学习"
+        contents:
+          - section: "Chapter 1: Transformer 基础"
+            contents:
+              - deep-learning/positional-encoding-why.qmd
+              - deep-learning/positional-encoding-sinusoidal.qmd
+          - section: "Chapter 2: 优化算法"
+            contents:
+              - deep-learning/optimizers.qmd

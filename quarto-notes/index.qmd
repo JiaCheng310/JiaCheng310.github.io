@@ -1,0 +1,23 @@
+---
+title: "Jiacheng's Notes"
+author: Jiacheng Zhang
+date: 2026-06-07
+page-layout: full
+listing:
+  contents:
+    - robotics/index.qmd
+    - deep-learning/index.qmd
+  type: table
+  fields: [title, author, date]
+  sort: title asc
+  date-format: iso
+---
+
+这里是系统整理的学习笔记。普通博客文章仍然保留在主站，Notes 会按照课程/讲义的方式组织内容。
+
+## 使用方式
+
+- 左侧是全局章节目录。
+- 右侧是当前页面目录。
+- 中间是正文或章节列表。
+- 源文件统一写在 `quarto-notes/` 中，格式为 Quarto Markdown (`.qmd`)。

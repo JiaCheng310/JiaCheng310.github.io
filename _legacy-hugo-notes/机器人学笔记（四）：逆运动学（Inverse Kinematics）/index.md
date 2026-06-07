@@ -1,0 +1,575 @@
+---
+title: 机器人学笔记（四）：逆运动学（Inverse Kinematics）
+description: 简要介绍逆运动学及其解法
+date: 2026-06-06
+slug:
+tags:
+  - 机器人学
+  - 优化问题
+draft: true
+math: true
+---
+下面我们会介绍**逆运动学（Inverse Kinematics）** 及其解法，在之前提及的正运动学中，问题可以被定义为，已经知道机械臂的关节角 $x$ ，想要求得末端位姿 $p$ ：
+$$
+ p =f(x)
+ $$
+ 但是在实际机器人任务中，我们往往不是先知道关节角，而是先知道希望末端到达的位置。例如希望机械臂末端移动到桌面上的某个点，或者希望夹爪以某个姿态靠近物体。
+ 
+ 此时问题变成：已知目标末端位姿 $p$，如何求出对应的关节角 $x$ ：$$
+ x = f^{-1}(p)
+ $$然而由于 $f$ 的非线性，我们难以直接求得解析解（并非此文重点），在讨论求解上述方程之前，我们需要依次讨论解的存在性和多解情况。
+
+
+## IK 解的存在性
+
+我们引入如下概念：
+
+末端可以到的位置（不考虑姿态）称为**工作空间（Workspace）**：
+
+![[Pasted image 20260606170724.png|400]]
+
+如图绿色区域是可达的，但红色区域不可达。若目标不在工作空间里面，那自然是无解的。判断目标是否在目标空间里可以避免无效的搜索/求解。
+
+工作空间又可以分成以下两种：
+
+**可达工作空间（Reachable Workspace）：** 机械臂末端至少能以一种姿态到达的所有位置的集合
+$$
+ W_R = \{ p : \exists x ,p=f(x)\}
+ $$
+
+**灵巧工作空间（Dexterous Workspace）：** 机械臂 末端能够以任何姿态到达的位置的集合
+$$
+ W_D = \{ p : \forall R \in SO(3),\exists x ,p=f(x,R)\}
+$$
+![[Pasted image 20260606170512.png|500]]
+
+上例左图的机械臂拥有灵巧工作空间，但右图没有
+
+
+## IK 多解
+
+通常，关节数量越多、连杆参数中非零项越多，到达某一特定目标位姿的方式也可能越多，即 IK 解的数量可能增加，即同一个末端目标位置或位姿，可能对应多组不同的关节角。但是机器人最终只能选择其中一个解来执行，因此需要根据具体任务设置解的选择标准。
+
+![[Pasted image 20260606171214.png|500]]
+
+在最后解的选择上，会有许多考虑：关节限位、运动平滑、离当前构型近、避障、远离奇异位形等等
+
+
+## IK的求解方法
+
+
+IK 的求解方法大致可以分为四种：分别是解析法（the Analytic family）、数值法（the Numerical family）、数据驱动法（Data-driven methods）和混合法（the Hybrid family of solvers）。
+
+本文只会大致介绍简单常见的几种算法，详细可以参考[《Inverse Kinematics Techniques in Computer Graphics: A Surve》][https://www.andreasaristidou.com/publications/papers/IK_survey.pdf]
+
+### 解析法
+
+#### 代数法
+
+下面我们以2D RRR机械臂为例，为了一般化，我们沿用Craig书中的体系，考虑求解的是机械臂本体最后一节相对于基座的位姿 $\{W\}={}^0_WT$ ，而非机械臂末端工具（如夹爪）相对于基座的位姿 $\{T\}={}^0_TT$，这样的好处在于，机械臂的工具是可变的，工程上会单独处理工具和最后一节之间的偏移 ${}^W_T T$ 。
+
+![[Pasted image 20260606191213.png|350]]
+
+首先列出D-H参数表：
+
+| 编号  | $\alpha_{i-1}$ | $a_{i-1}$ | $\theta_i$ | $d_i$ |
+| --- | -------------- | --------- | ---------- | ----- |
+| 1   | 0              | 0         | $\theta_1$ | 0     |
+| 2   | 0              | $l_1$     | $\theta_2$ | 0     |
+| 3   | 0              | $l_2$     | $\theta_3$ | 0     |
+
+我们试图达到的位姿目标是：$$
+{}^0_3T = \begin{bmatrix}
+\cos \phi & -\sin \phi & 0&x\\
+\sin\phi & \cos \phi &0&y\\
+0&0&1&0\\
+0&0&0&1
+\end{bmatrix}
+$$ 
+其中 $x,y,\phi$ 都是未知的我们已知的实际数值。又由我们之前的FK可知：
+
+$$
+{}^0_3T = \begin{bmatrix}
+\cos (\theta_1+\theta_2+\theta_3) & -\sin(\theta_1+\theta_2+\theta_3) & 0&l_1\cos\theta_1+l_2\cos(\theta_1+\theta_2)\\
+\sin(\theta_1+\theta_2+\theta_3) & \cos(\theta_1+\theta_2+\theta_3) &0&l_1\sin\theta_1+l_2\sin(\theta_1+\theta_2)\\
+0&0&1&0\\
+0&0&0&1
+\end{bmatrix}
+$$
+
+从而我们可以得到：
+$$
+\begin{cases}
+&x = l_1\cos\theta_1+l_2\cos(\theta_1+\theta_2)\\
+&y = l_1\sin\theta_1+l_2\sin(\theta_1+\theta_2)\\
+&\phi = \theta_1 + \theta_2+\theta_3
+\end{cases}
+$$
+随后平方相加：
+$$
+x^2+y^2 = l_1 + l_2 + 2l_1l_2\cos\theta_2
+$$
+进而解得：
+$$
+\cos\theta_2 = \frac{x^2+y^2-l_1-l_2}{2l_1l_2},\qquad \sin\theta_2 = \pm\sqrt{1-\cos^2\theta_2}
+$$
+$$
+\theta_2 = \text{Atan2}(\cos\theta_2,\sin\theta_2)
+$$
+解出 $\theta_2$ 后考虑：
+$$
+\begin{aligned}
+&x = l_1\cos\theta_1 + l_2(\cos\theta_1\cos\theta_2-\sin\theta_1\sin\theta_2)=(l_1+l_2\cos\theta_2)\cos\theta_1-l_2\sin\theta_2\sin\theta_1\\
+& y =l_1\sin\theta_1 + l_2(\sin\theta_1\cos\theta_2+\cos\theta_1\sin\theta_2)=(l_1+l_2\cos\theta_2)\sin\theta_1+l_2\sin\theta_2\cos\theta_1
+\end{aligned}
+$$
+我们定义：
+$$
+\begin{aligned}
+&k_1 =l_1+ l_2\cos\theta_2,\qquad k_2 = l_2\sin\theta_2\\
+&r = \sqrt{k_1^2+k_2^2},\qquad \gamma = \text{Atan2}(k_2,k_1)
+\end{aligned}
+$$
+我们可以重写：
+$$
+\begin{aligned}
+&\frac{x}{r} = \cos \gamma \cos\theta_1 - \sin\gamma\sin\theta_1 = \cos(\gamma+\theta_1)\\~\\
+&\frac{y}{r} = \cos\gamma\sin\theta_1  + \sin\gamma \cos\theta_1=\sin(\gamma+\theta_1)
+\end{aligned}
+$$
+从而：
+$$
+\begin{cases}
+&\theta_1 = \text{Atan2}(\frac{x}{r},\frac{y}{r})-\gamma\\~\\
+&\theta_2 =  \text{Atan2}(\cos\theta_2,\sin\theta_2)\\~\\
+&\theta_3 = \phi - \theta_1-\theta_2
+\end{cases}
+$$
+#### 几何法
+
+相同的问题（忽略图示的差距），我们也已知机器人本体最后一节的位姿，想要反求各个关节角：
+$$
+{}^0_3T = \begin{bmatrix}
+\cos \phi & -\sin \phi & 0&x\\
+\sin\phi & \cos \phi &0&y\\
+0&0&1&0\\
+0&0&0&1
+\end{bmatrix}
+$$
+![[Pasted image 20260606201356.png|400]]
+
+此时根据图片中的坐标系，我们有：
+$$
+x^2+y^2 = l_1^2+l_2^2 -2l_1l_2\cos(180^\degree+\theta_2)
+$$
+注意我们根据右手定则方向为正，此时的关节角 $\theta_2<0$ ，因此 $180^\degree+\theta_2$ 才是三角形的内角
+
+因此可以得到（图中的虚实线就是对应的两个解）：
+$$
+\cos\theta_2 = \frac{x^2+y^2-l_1^2-l_2^2}{2l_1l_2},\qquad \sin\theta_2 = \pm \sqrt{1-\cos^2\theta_2}
+$$
+再考虑 $\beta$ 和 $\psi$ ：
+$$
+\cos\beta = \frac{y}{x},\qquad \cos\psi = \frac{x^2+y^2+l_1^2-l_2^2}{2l_1\sqrt{x^2+y^2}}
+$$
+则我们有：
+$$
+\theta_1 = \beta \pm \psi ,\theta_3 = \phi - \theta_1-\theta_2
+$$
+
+
+#### 6自由度机械臂的Pieper准则
+
+上述两个解析解法都是针对平面机械臂而言的，对于六自由度机械臂通常没有解析解。Pieper针对特殊情况提出了**六自由度机械臂有解析解的充分条件**：
+
+$$
+\text{三根连续关节轴相交于一点或三根连续关节轴彼此平行}
+$$
+
+目前大多数工业机械臂在设计时都会满足这个条件：
+![[Pasted image 20260606205801.png|200]]
+
+后三轴线交在一点称为**球腕（spherical wrist）**，它们所交的点叫作**腕点（wrist center）**。不难发现，后三轴的运动不改变腕点空间位置，只改变腕点姿态，此时由前三轴承担了定位的功能，。
+
+Craig书中的PUMA560机械臂求解例子，此时后腕点正好是后三轴坐标系的原点：
+
+![[Pasted image 20260606212325.png|500]]
+
+关于PUMA560的IK解析解法，涉及到求逆较为复杂，可以参考Craig的机器人导论，本文不再赘述。
+
+
+### 数值法
+
+#### 动起来的机械臂
+
+首先回到我们最初尝试解决的问题，已知末端位姿，想要反求关节角：
+
+$$
+x = f^{-1}(p)
+$$
+
+实际应用中解析法很可能不满足或极难求解，与其考虑一次得到方程的闭式解，我们能不能通过数值的方式逐步逼近目标？
+
+例如当前关节角为 $x_k$，目标位姿是 $p_d$ ，通过正运动学我们可以得到当前的末端位姿：
+$$
+p_k = f(x_k)
+$$
+只要我们可以衡量两个位姿之间的误差，并通过某种方式不断改变关节角缩小误差，就可以达到求解的目的，我们先引入下面的概念：
+
+
+##### 线速度
+
+空间中一点的 **线速度** 是位置矢量对时间的导数：点 $Q$ 相对于坐标系 $\{B\}$ 的线速度定义为：
+$$
+{}^BV_Q = \frac{d}{d t}{}^BQ(t) = \lim_{\Delta t \rightarrow 0} \frac{Q(t+\Delta t)-Q(t)}{\Delta t}
+$$
+![[Pasted image 20260607154823.png|400]]
+由于坐标系之间不总是精致的，同一个点相对于不同坐标系的线速度可以不一样，并且线速度矢量在不同坐标系中的表示也不一样。为了区别开这两种坐标系，我们把在坐标系 $\{B\}$ 中求解并在坐标系 $\{A\}$ 中表示的线速度写为：
+$$
+{}^A({}^BV_Q) = \frac{{}^Ad}{d t}{}^BQ(t) 
+$$
+对于在同一个坐标系下的线速度，可以直接写成：
+$$
+{}^B({}^BV_Q)={}^BV_Q
+$$
+由于线速度是自由向量（free vector），即只考虑大小和方向，不考虑起点。我们可以利用坐标系之间的旋转矩阵来转换：
+$$
+{}^A({}^BV_Q) = {}^A_BR {}^BV_Q
+$$
+
+在机器人学里面，我们往往关心的是某个坐标系原点相对于世界坐标系的线速度，例如坐标系 $\{C\}$ 相对于一个默认不动的世界坐标系 $\{U\}$ 的线速度可以写成：
+$$
+v_C = {}^UV_{CORG}
+$$
+
+##### 角速度
+
+**角速度** 描述空间中一个刚体的旋转运动。由于刚体的姿态通过固连在刚体上的坐标系表示，因此角速度也主要描述坐标系的旋转运动。
+
+![[Pasted image 20260607162635.png|400]]
+
+如图表示，我们把坐标系 $\{B\}$ 相对于坐标系 $\{A\}$ 转动的角速度记为 ${}^A\Omega_B$ 。和线速度类似地，角速度也可以在任意的坐标系中描述，在坐标系 $\{C\}$ 中描述可以记为：
+
+$$
+{}^C({}^A\Omega_B) = {}^C_AR{}^A\Omega_B
+$$
+
+当坐标系相对于一个默认不动的世界坐标系 $\{U\}$ 转动，角速度可以简写：
+$$
+w_C = {}^U\Omega_C
+$$
+为了求解角速度，先对旋转矩阵求导得到：
+$$
+\dot{R} = \lim_{\Delta t\rightarrow 0}\frac{R(t+\Delta t)-R(t)}{\Delta t}
+$$
+其中 $R(t+\Delta t)$ 相当于在 $R(t)$ 的基础上，对某个轴 $\hat{K}$ 旋转微小量 $\Delta\theta$ 得到的。即：
+$$
+R(t+\Delta t) = R_{\hat{K}}(\Delta \theta) R(t)
+$$
+进而我们可以重写：
+
+$$
+\dot{R} = \lim_{\Delta t\rightarrow 0}\frac{R_{\hat{K}}(\Delta\theta)-I_3}{\Delta t}R(t)
+$$
+
+不失一般性，我们可以把 $\hat{K}$ 看作一个单位轴 $\hat{K} = [k_x,k_y,k_z]^\top$ ，三个分量平方和为 $1$。我们可以利用**Rodrigues 旋转公式** 来研究 $R_{\hat{R}}(\Delta \theta)$ ，下述会先推导该公式，读者也可以选择直接使用:
+
+不妨考虑一个向量 $v$ 绕轴 $\hat{K}$ 旋转 $\theta$ ，我们把向量分解成垂直和平行轴 $\hat{K}$ 的两个分量 $v_{\perp}$ 和 $v_{\parallel}$ ：
+
+$$
+\begin{aligned}
+v_{\parallel} &= (\hat{K}\cdot  v)v=\hat{K}^\top\hat{K}v\\~\\
+v_{\perp} &= v - v_{\parallel} = v-\hat{K}^\top\hat{K}v
+\end{aligned}
+$$
+
+显然，平行分量在旋转中不变化，只需要考虑垂直分量旋转 $\theta$ ：
+$$
+v^{\text{rot}}_{\perp} = v_{\perp}\cos\theta + (\hat{K}\times v_{\perp})\sin\theta 
+$$
+由于 $\hat{K}\times v_{\parallel}=0$ ，也可以写成：
+$$
+v^{\text{rot}}_{\perp} = v_{\perp}\cos\theta + (\hat{K}\times v)\sin\theta 
+$$
+因此旋转后的向量为：
+$$
+\begin{aligned}
+v^{\text{rot}} &= v_{\parallel}+v^{\text{rot}}_{\perp} \\
+& = \hat{K}^\top\hat{K}v + v_{\perp}\cos\theta + (\hat{K}\times v)\sin\theta \\
+& = \hat{K}^\top\hat{K}v + (v-\hat{K}^\top\hat{K}v)\cos\theta + (\hat{K}\times v)\sin\theta \\
+&=v\cos\theta + \hat{K}^\top\hat{K}v(1-\cos\theta) + (\hat{K}\times v)\sin\theta
+\end{aligned}
+$$
+
+也可以写成矩阵形式，先把定义叉乘矩阵：
+
+$$
+[\hat{K}]_{\times} = \begin{bmatrix}
+0 & -k_z & k_y\\
+k_z & 0 & -k_x\\
+-k_y & k_x & 0
+\end{bmatrix}
+$$
+
+这个矩阵满足 $[\hat{K}]_{\times}v = \hat{K}\times v$ （读者可自行验证），从而上式可以写成：
+$$
+v^{\text{rot}}  = (I\cos\theta + (1-\cos\theta)\hat{K}^\top\hat{K}+[\hat{K}]_{\times})v
+$$
+从而旋转矩阵就是：
+$$
+R_{\hat{K}}(\theta) =  (I\cos\theta + (1-\cos\theta)\hat{K}^\top\hat{K}+[\hat{K}]_{\times})=\begin{bmatrix}
+
+k_x^2v_\theta+c_\theta &  
+k_xk_yv_\theta-k_zs_\theta &  
+k_xk_zv_\theta+k_ys_\theta \\  
+  
+k_xk_yv_\theta+k_zs_\theta &  
+k_y^2v_\theta+c_\theta &  
+k_yk_zv_\theta-k_xs_\theta \\  
+  
+k_xk_zv_\theta-k_ys_\theta &  
+k_yk_zv_\theta+k_xs_\theta &  
+k_z^2v_\theta+c_\theta
+\end{bmatrix}
+$$
+其中，$c_\theta = \cos\theta,\quad s_\theta = \sin\theta,\quad v_\theta = 1-\cos\theta$  
+
+有了上述的公式之后，我们回到：
+
+$$
+\dot{R} = \lim_{\Delta t\rightarrow 0}\frac{R_{\hat{K}}(\Delta\theta)-I_3}{\Delta t}R(t)
+$$
+代入上面的旋转矩阵：
+
+$$
+\begin{aligned}
+\hat{R} = \lim_{\Delta t\rightarrow 0}\frac{R_{\hat{K}}(\Delta\theta)-I_3}{\Delta t}R(t) = R(t) \lim_{\Delta t\rightarrow 0}\frac{R_{\hat{K}}(\Delta\theta)-I_3}{\Delta t}
+\end{aligned}
+$$
+
+由于 $\Delta \theta$ 是一个极小量，可以近似有：$s_{\Delta \theta} = \Delta\theta,\quad c_{\Delta \theta} = 1,\quad v_{\Delta \theta} = 0$
+
+$$
+\begin{aligned}
+\dot{R} &= \lim_{\Delta t\rightarrow 0}\frac{\begin{bmatrix}
+1 &  
+-k_z\Delta\theta &  
+k_y\Delta\theta\\  
+  
+k_z\Delta\theta &  
+1 &  
+-k_x\Delta\theta \\  
+  
+-k_y\Delta\theta &  
+k_x\Delta\theta &  
+1
+\end{bmatrix}
+-I_3}{\Delta t}R(t)\\
+& = 
+\lim_{\Delta t\rightarrow 0}\frac{\begin{bmatrix}
+0 &  
+-k_z\Delta\theta &  
+k_y\Delta\theta\\  
+  
+k_z\Delta\theta &  
+0 &  
+-k_x\Delta\theta \\  
+  
+-k_y\Delta\theta &  
+k_x\Delta\theta &  
+0
+\end{bmatrix}}{\Delta t}R(t)\\~\\
+&=R(t)\begin{bmatrix}
+0 &  
+-k_z\dot{\theta} &  
+k_y\dot{\theta}\\  
+  
+k_z\dot{\theta} &  
+0 &  
+-k_x\dot{\theta} \\  
+  
+-k_y\dot{\theta} &  
+k_x\dot{\theta} &  
+0
+\end{bmatrix}
+\end{aligned}
+$$
+我们可以得到：
+$$
+\dot{R}R^{-1} = \begin{bmatrix}
+0 & -\Omega_z & \Omega_y\\
+\Omega_z & 0& -\Omega_x\\
+-\Omega_y & \Omega_x & 0
+
+\end{bmatrix}
+=[\Omega]_{\times}
+$$
+
+为什么我们要乘逆呢，注意此时 $R(t)$ 代表的是当前姿态， $\dot{R}$ 是并不是纯粹的角速度矩阵，它还带有当前姿态的信息。回想：
+$$
+\dot{R} = \lim_{\Delta t\rightarrow 0}\frac{R_{\hat{K}}(\Delta\theta)-I_3}{\Delta t}R(t)
+$$
+
+我们真正想要的是极限部分，因此右乘当前姿态逆。令 
+$$
+\Omega = \begin{bmatrix} 
+\Omega_x\\
+\Omega_y\\
+\Omega_z 
+\end{bmatrix} =
+\begin{bmatrix}
+k_x\dot{\theta}\\
+k_y \dot{\theta}\\
+k_z \dot{\theta}
+\end{bmatrix}
+= \hat{K}\dot{\theta}
+$$
+这就是我们需要的角速度向量，方向是瞬时旋转轴 $\hat{K}$ ，旋转速率是 $\dot{\theta}$
+
+刚刚得到的是 $\Omega$ 的叉乘矩阵，对于 $\forall p \in \mathbb{R}^3$：
+$$
+[\Omega]_{\times}p = \Omega \times p
+$$
+至此，我们已经研究了线速度和角速度，可以开始着手处理连杆的运动了。注意线速度是针对一个点而言的，但角速度是针对刚体/坐标系而言的。
+
+
+#### 速度变换
+
+对于机械臂的每一根连杆，我们都可以用一对速度来表示运动：
+$$
+(v_i,w_i)
+$$
+其中：
+ - $v_i$ 是连杆坐标系原点相对于 $\{0\}$ 移动的线速度
+ - $w_i$ 是连杆坐标系相对于 $\{0\}$ 转动的角速度
+ 
+此处我们把 $\{0\}$ 当作默认不动的世界坐标系。正如我们前文所述，线速度和角速度在不同的坐标系中表示可能不同，因此我们需要考虑一般的转换：
+
+假如坐标系 $\{B\}$ 相对于坐标系 $\{A\}$ 既有平移也有转动，在 $\{B\}$ 中的运动的一点 $Q$ ，其速度要在 $\{A\}$ 中表示。首先点 $Q$ 在 $\{A\}$ 中的表示可以写为：
+$$
+{}^AQ = {}^AP_{BORG} + {}^A_B R {}^BQ
+$$
+其中，${}^AP_{BORG}$ 是 $\{B\}$ 的原点在 $\{A\}$ 中的表示
+
+两边对时间求导：
+$$
+{}^AV_Q = {}^AV_{BORG} + {}^A_B\dot{R}{}^BQ + {}^A_BR{}^BV_Q
+$$
+而
+$$
+{}^A_B\dot{R} = [{}^A\Omega_B]_{\times} {}^A_BR
+$$
+故
+$$
+{}^A_B\dot{R}{}^BQ = [{}^A\Omega_B]_{\times} {}^A_BR {}^BQ = {}^A\Omega_B{\times} {}^A_BR{}^BQ
+$$
+从而我们有：
+
+$$
+{}^AV_Q = {}^AV_{BORG} +  {}^A_BR{}^BV_Q + {}^A\Omega_B{\times} {}^A_BR{}^BQ
+$$
+
+这个就可以帮助我们快速得到一个坐标系中某点在另一个坐标系的表示。
+
+
+#####  速度递推公式
+
+机械臂是一系列连杆：
+$$
+\{0\} \rightarrow \{1\} \rightarrow\{2\}\rightarrow \cdots
+$$
+对于第 $i$ 个连杆，我们关心：
+$$
+({}^iv_i,{}^iw_i)
+$$
+其中：
+- ${}^iv_i$ 指第 $i$ 根连杆坐标系原点相对于基座坐标系的线速度在 $\{i\}$ 中表示
+- ${}^iw_i$ 指第 $i$ 根连杆坐标系原点相对于基座坐标系的角速度在 $\{i\}$ 中表示
+
+![[Pasted image 20260607202240.png|400]]
+
+速度递推的基本想法是，我们已经知道了 $({}^iv_i$ ,${}^iw_i)$ ，想求 $({}^{i+1}v_{i+1},{}^{i+1}w_{i+1})$，这要求我们考虑两个运动：
+
+- 第 $i$ 根连杆的运动带动第 $i+1$ 根连杆的运动
+- 第 $i+1$ 个关节给第 $i+1$ 根连杆施加的运动
+
+下面我们按照第 $i+1$ 个关节分类讨论：
+
+
+
+**第 $i+1$ 个关节是转动关节**
+
+此时转动关节发生转动会增加连杆 $i+1$ 的角速度， 它绕着轴 $\hat{Z}_{i+1}$ 转动，速度为 $\dot{\theta}_{i+1}$ ，则角速度变为：
+$$
+{}^{i+1}w_{i+1} = {}^{i+1}_iR {}^iw_i + \dot{\theta}_{i+1}\hat{Z}_{i+1}
+$$
+再考虑角速度，$\{i+1\}$ 的原点在 $\{i\}$ 有一个位置向量 ${}^iP_{i+1}$ ，坐标系 $\{i\}$ 由于转动具有角速度 ${}^iw_i$，从而：
+$$
+{}^iv_{i+1} ={}^iv_{i} + {}^iw_i\times {}^iP_{i+1}
+$$
+
+由于这个线速度是在 $\{i\}$ 中表示的，我们还需要乘上一个旋转矩阵：
+
+$$
+{}^{i+1}v_{i+1} ={}^{i+1}_iR({}^iv_{i} + {}^iw_i\times {}^iP_{i+1})
+$$
+
+**第 $i+1$ 个关节是移动关节**
+
+移动关节沿着 $\hat{Z}_{i+1}$ 平移，速度为 $\dot{d}_{i+1}$，因此角速度和线速度为：
+
+$$
+\begin{aligned}
+{}^{i+1}w_{i+1} &= {}^{i+1}_iR{}^iw_{i}\\~\\
+{}^{i+1}v_{i+1} &= {}^{i+1}_iR{}^i(v_i+{}^iw_i\times{}^iP_{i+1})  + \dot{d}_{i+1}\hat{Z}_{i+1}
+
+\end{aligned}
+$$
+![[Pasted image 20260607205048.png|500]]
+
+我们以一个例子计算来理解，考虑如下的平面RR机械臂，我们想求解末端的线速度和角速度：
+
+![[Pasted image 20260607213343.png|300]]
+
+联系上一章的内容，我们先写出几个齐次变换矩阵：
+$$
+\begin{aligned}
+
+{}^1_0 T&=\begin{bmatrix}
+c_1&-s_1 & 0&0\\
+s_1 & c_1 & 0&0\\
+0&0&1&0\\
+0&0&0&1
+\end{bmatrix}
+,\qquad
+{}^2_1 T=\begin{bmatrix}
+c_2&-s_2 & 0&l_1\\
+s_2 & c_2 & 0&0\\
+0&0&1&0\\
+0&0&0&1
+\end{bmatrix}
+\\~\\
+{}^3_2 T&=\begin{bmatrix}
+1&0 & 0&l_2\\
+0 & 1 & 0&0\\
+0&0&1&0\\
+0&0&0&1
+\end{bmatrix}
+
+
+\end{aligned}
+$$
+
+基座坐标系有 ${}^0v_0 = [0,0,0]^\top,{}^0w_0 = [0,0,0]^\top$  ，第一根连杆：
+$$
+\begin{aligned}
+{}^1w_1 &= {}^1_0R{}^0w_0 + \dot{\theta}_1\hat{Z}_1 = \begin{bmatrix}
+0\\
+0\\
+\dot{\theta}_1
+\end{bmatrix}\\
+{}^1v_1 &= 
+\end{aligned}
+$$
+
+

@@ -1,0 +1,17 @@
+---
+title: "机器人学笔记"
+author: Jiacheng Zhang
+date: 2026-06-07
+description: "从优化问题、正运动学到逆运动学，按学习顺序整理机器人学基础。"
+---
+
+这组笔记会尽量按课程讲义的方式组织：先定义问题，再讨论模型，最后进入算法和实现。
+
+## 章节
+
+| Part | Chapter | Topic |
+|---|---|---|
+| Part 1 | [优化问题求解](optimization.qmd) | 任务建模、代价函数 |
+| Part 2 | [平面机械臂正运动学](fk-2d.qmd) | Forward Kinematics |
+| Part 2 | [三维机械臂正运动学](fk-3d.qmd) | MDH、齐次变换 |
+| Part 3 | [逆运动学](ik.qmd) | IK、多解性、Pieper 准则 |

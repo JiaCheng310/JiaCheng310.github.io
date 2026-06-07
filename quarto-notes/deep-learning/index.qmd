@@ -1,0 +1,14 @@
+---
+title: "深度学习笔记"
+author: Jiacheng Zhang
+date: 2026-06-07
+description: "Transformer、位置编码和优化器相关笔记的系统整理。"
+---
+
+## 章节
+
+| Part | Chapter | Topic |
+|---|---|---|
+| Part 1 | [为什么需要位置编码](positional-encoding-why.qmd) | Attention 的置换不变性 |
+| Part 1 | [Sinusoidal 位置编码](positional-encoding-sinusoidal.qmd) | 正弦位置编码 |
+| Part 2 | [几种常见的优化器](optimizers.qmd) | SGD、Momentum、RMSProp、Adam |

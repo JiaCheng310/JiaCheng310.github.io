@@ -51,6 +51,21 @@
 {{- partial "home_info.html" . }}
 {{- end }}
 
+{{- if and .IsHome (eq $paginator.PageNumber 1) }}
+<article class="post-entry notes-entry">
+  <header class="entry-header">
+    <h2>Notes</h2>
+  </header>
+  <div class="entry-content">
+    <p>系统整理的学习笔记，按章节组织，包含左侧全局目录、右侧文章目录和搜索。</p>
+  </div>
+  <footer class="entry-footer">
+    Quarto Notes
+  </footer>
+  <a class="entry-link" aria-label="open notes" href="{{ "notes/" | relURL }}"></a>
+</article>
+{{- end }}
+
 {{- $term := .Data.Term }}
 {{- range $index, $page := $paginator.Pages }}
 

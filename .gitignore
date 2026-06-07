@@ -3,6 +3,12 @@ public/
 resources/_gen/
 .hugo_build.lock
 
+# Quarto notes build/cache output
+quarto-notes/.quarto/
+quarto-notes/_freeze/
+quarto-notes/_site/
+static/notes/
+
 # Astro / Node leftovers
 dist/
 .astro/

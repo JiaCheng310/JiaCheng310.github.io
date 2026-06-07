@@ -40,6 +40,15 @@ jobs:
           hugo-version: ${{ env.HUGO_VERSION }}
           extended: true
 
+      - name: Setup Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Render Quarto notes
+        run: |
+          quarto render quarto-notes
+          mkdir -p static/notes
+          cp -R quarto-notes/_site/. static/notes/
+
       - name: Build with Hugo
         run: hugo --minify --cleanDestinationDir
 

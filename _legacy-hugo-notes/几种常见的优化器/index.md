@@ -1,0 +1,223 @@
+---
+title: 几种常见的优化器
+description: 介绍SGD、Momentum、RMSProp和Adam以及AdamW
+date: 2026-06-02
+slug:
+tags:
+  - 优化器
+  - Adam
+draft: false
+math: true
+---
+我们可以把神经网络视作参数化函数：
+$$
+f_\theta: \mathcal{X} \to \mathcal{Y}, \quad \theta \in \mathbb{R}^d
+$$
+给定训练集$\{(x_i,y_i)\}_{i=1}^{N}$ ，和损失函数 $\ell: \mathcal{Y} \times \mathcal{Y} \to \mathbb{R}$，总损失可以定义为：
+$$
+\mathcal{L}(\theta) = \frac{1}{N} \sum_{i=1}^N \ell\big(y_i, f_\theta(x_i)\big)
+$$
+我们的目标是寻求最优参数 $\theta^*$，使得 $f_{\theta^*}$ 的损失最小
+
+## 梯度下降
+
+为了寻求损失的最小值，在单变量函数中，我们常用的操作是求导，对于高维函数即求梯度，考虑损失函数的梯度：
+$$
+g = \nabla_\theta \mathcal{L}(\theta)=\frac{1}{N} \sum^N_{i=1} \nabla_\theta \ell\big(y_i, f_{\theta}(x_i)\big)
+$$
+从而我们可以利用这个梯度来更新参数：
+
+$$
+\theta_{new} = \theta - \eta \cdot g
+$$
+
+其中，$\eta$ 叫做学习率，由它和 $g$ 共同决定参数更新的幅度。由于这是一个不断优化的过程，因此会加入步数 $t$：
+$$
+\begin{aligned}
+&g_{t} = \nabla_\theta \mathcal{L}(\theta_t)=\frac{1}{N} \sum^N_{i=1} \nabla_\theta \ell\big(y_i, f_{\theta_t}(x_i)\big)\\
+&\theta_{t+1} = \theta_{t} - \eta \cdot g_{t}
+\end{aligned}
+$$
+
+然而上述是非常理想的情况，要求我们能够计算出所有的训练样本的梯度，当数据集很大时，这会带来巨大的计算开销。我们需要考虑怎么估计梯度 $g_t$ ，这就引申出了下述的随机梯度下降
+
+
+## SGD （Stochastic Gradient Descent）
+
+随机梯度下降的思想是，可以通过抽取**部分样本**计算 $\hat{g_t}$，从而估计整体的梯度。我们此处考虑的训练集是固定的 $\mathcal{D}=\{(x_i,y_i)\}_{i=1}^{N}$ ，因此误差只来源于抽样，我们首先证明这样计算出的梯度是整体梯度的无偏估计，考虑我们每一步从训练集中抽取 $\mathcal{B}=1,2,\cdots,N$ 个样本，则计算的梯度为：
+$$
+\hat{g_{t}} = \frac{1}{\mathcal{B}} \sum^\mathcal{B}_{i=1} \nabla_\theta \ell\big(y_i, f_{\theta_t}(x_i)\big)
+$$
+由于每个样本只有被选中和没被选中两种情况，我们可以引入一个示性函数：
+
+$$
+I(x_i,y_i)
+=\begin{cases}
+1,\quad \text{样本$(x_i,y_i)$选中}\\~\\ 
+0,\quad \text{样本$(x_i,y_i)$没选中}
+\end{cases}
+$$
+从而可以把上式转化为：
+
+$$
+\hat{g_{t}} = \frac{1}{\mathcal{B}} \sum^N_{i=1} \nabla_\theta \ell\big(y_i, f_{\theta_t}(x_i)\big)\cdot I(x_i,y_i)
+$$
+
+对这个式子求期望：
+$$
+\begin{aligned}
+\mathbb{E}[\hat{g_t} | \mathcal{D},\theta_t] &= \frac{1}{\mathcal{B}} \sum^N_{i=1} \nabla_\theta \ell\big(y_i, f_{\theta_t}(x_i)\big)\cdot\mathbb{E}[I(x_i,y_i)|\mathcal{D},\theta_t]\\
+&= \frac{1}{\mathcal{B}} \sum^N_{i=1} \nabla_\theta \ell\big(y_i, f_{\theta_t}(x_i)\big)\cdot \frac{\mathcal{B}}{N}\\
+& = \frac{1}{N} \sum^N_{i=1} \nabla_\theta \ell\big(y_i, f_{\theta_t}(x_i)\big)
+\end{aligned}
+$$
+
+因此随机抽样计算出的梯度是无偏的，这个方法可以一般化为：
+
+$$
+\begin{aligned}
+&g_{t} = \frac{1}{\mathcal{B}} \sum^\mathcal{B}_{i=1} \nabla_\theta \ell\big(y_i, f_{\theta}(x_i)\big)\\
+&\theta_{t+1} = \theta_t - \eta\cdot g_t
+\end{aligned}
+$$
+
+然而，尽管这种方法是无偏的，计算出来的 $g_t$ 方差非0，这仍然会引入随机性（除非所有样本的梯度一样），这种随机性的引入会带来一些问题，如下：
+
+![[Pasted image 20260603210610.png | 300]]
+
+可以看到SGD的轨迹相较全批量的梯度下降更抖，而且当损失函数一个方向陡峭（如图中的 $y=-x$ 方向），另一个方向平缓时（如图中的 $y=x$ 方向），这种随机性的引入会导致优化更不稳定。
+
+更极端的情况是随机抽一个样本落在鞍点，导致参数不更新。为了缓解上述现象，**Momentum**应运而生。
+
+## SGD with Momentum
+
+Momentum 是在梯度下降中加入惯性的一种方法，它不只看当前的梯度，还会利用过去的梯度更新，在上述SGD计算 $g_t$ 之外，额外维护一个 $v_t$：
+
+$$
+\begin{aligned}
+&v_{t+1} = \beta v_{t} - \eta g_t\\~\\
+&\theta_{t+1} = \theta_{t} +v_{t+1}
+\end{aligned}
+$$
+
+其中，初始化 $v_0=0$，$\beta \in [0,1)$ 为动量系数（通常取$0.9$）。
+
+直观的理解为：
+- 如果多个步骤的梯度方向比较一致，Momentum 会不断累积速度，让参数更新更快
+- 如果某个方向上梯度来回震荡，正负方向会互相抵消，震荡会被减弱
+
+效果大致如下：
+
+![[Pasted image 20260603212529.png|300]]
+
+可见其缓解了SGD的震荡，并且在相同的更新步数下， 比Full-Batch GD优化得更快。得益于保留了历史的梯度，这种情况下避免了落入鞍点无法更新参数的问题。
+
+
+## AdaGrad（Adaptive Gradient Algorithm）
+
+目前所介绍的优化器都是针对梯度而言的，如果我们更新中的 $\eta$ 始终固定，可能会出现在某一次更新中由于梯度过大而错过损失函数谷底的情况，因此在2011年，学者们提出了第一个**自适应学习率优化器AdaGrad**，它的核心思想是：**每个参数都有自己的学习率，并且历史梯度越大，这个参数后面的学习率越小**
+
+$$
+\begin{aligned}
+&G_t = G_{t-1} + g_t \odot g_t\\~\\
+&\theta_{t+1}=\theta_t-\eta\frac{g_t}{\sqrt{G_t} + \epsilon}
+\end{aligned}
+$$
+
+其中，$G_0 = 0$，$\epsilon$ 为一个极小的正数，$\odot$ 表示逐元素乘法，除法、平方根和加法都是逐元素操作。
+
+直观的理解是，如果某个参数维度过去经常出现较大梯度，那么学习率就会变小，防止过大的更新；如果某个参数维度过去的梯度都比较小，对应的学习率会保持，从而让该特征仍然能够被充分学习。
+
+然而，注意到 $G_t$ 是不断增长的，这导致学习率会越来越小。训练后期可能出现学习率过度衰减，使参数几乎停止更新的情况，这个问题在RMSProp中被解决了 
+
+
+## RMSProp（ Root Mean Square Propagation）
+
+RMSProp的核心思想是：**不要累加所有历史梯度平方，而是用指数滑动平均记录近期梯度平方**：
+
+$$
+\begin{aligned}
+&v_t =\beta v_{t-1}+(1-\beta)(g_t \odot g_t)\\~\\
+&\theta_{t+1}=\theta_t-\eta\frac{g_t}{\sqrt{v_t} + \epsilon}
+\end{aligned}
+$$
+
+其中，$\beta$ 是衰减率，$v_0 = 0$。这种方法引入了指数衰减导致早期梯度对这步更新影响小（权重小），可以自适应地调整该参数的学习率，不会一直趋向于0。
+
+
+## Adam（Adaptive Moment Estimation）
+
+Adam优化器可以看作 **Momentum** 和 **RMSProp** 的结合，它通过维护一阶动量和二阶动量结合了二者的优势：
+
+$$
+\begin{aligned}
+&m_{t} = \beta_1m_{t-1} + (1-\beta_1)g_{t}\\~\\
+&v_{t} = \beta_2v_{t-1} + (1-\beta_2)(g_{t}\odot g_{t})
+\end{aligned}
+$$
+
+由于初始化 $m_0=0,v_0=0$，会导致初期的估计较小：
+$$
+\begin{aligned}
+m_t &= \beta_1 m_{t-1} + (1-\beta_1)g_t\\
+&=(1-\beta_1)g_t + \sum_{k=1}^{t-1}\beta_1^{t-k}(1-\beta_1)g_k\\
+& = (1-\beta_1)\sum_{k=1}^t\beta_1^{t-k}g_k\\
+\end{aligned}
+$$
+假设 $\mathbb{E}[g_k] = \mu$ ，对上式求期望有：
+$$
+\begin{aligned}
+\mathbb{E}[m_t] &=  (1-\beta_1)\sum_{k=1}^t\beta_1^{t-k}\mathbb{E}[g_k]\\
+& = (1-\beta_1)\frac{1-\beta_1^t}{1-\beta^1}\mu\\
+& = (1-\beta_1^t)\mu
+\end{aligned}
+$$
+
+因此 $m_t$ 估计和 $\mu$ 差了一个系数 $1-\beta_1^t$ ，考虑修正：
+$$
+\hat{m_t} = \frac{m_t}{1-\beta_1^t}
+$$
+同理有：
+$$
+\hat{v_t} = \frac{v_t}{1-\beta_2^t}
+$$
+从而Adam的整体更新公式如下：
+
+$$
+\begin{aligned}
+&m_{t} = \beta_1m_{t-1} + (1-\beta_1)g_{t}\\~\\
+&v_{t} = \beta_2v_{t-1} + (1-\beta_2)(g_{t}\odot g_{t})\\~\\
+&\hat{m_t} = \frac{m_t}{1-\beta_1^t},\hat{v_t} = \frac{v_t}{1-\beta_2^t}\\~\\
+&\theta_{t+1} = \theta_t - \frac{\eta}{\sqrt{\hat{v_t}}+\epsilon}\hat{m_t}
+\end{aligned}
+$$
+
+
+
+## AdamW
+
+**AdamW**在2017年被提出，旨在改善Adam优化器中权重衰减与梯度更新耦合的问题，具体而言，我们通常会在损失函数中加入$L_2$ 正则化：
+
+$$
+\mathcal{L}(\theta) = \frac{1}{N} \sum_{i=1}^N \ell\big(y_i, f_\theta(x_i)\big)+\frac{\lambda}{2}\|\theta\|_2^2
+$$
+从而求出来的 $g_t$ 变为：
+$$
+g_t = \nabla_{\theta}\mathcal{L}(\theta_t) + \lambda\theta
+$$
+
+因此在Adam的更新过程中，$\lambda \theta$ 这一正则项也会被 $\sqrt{\hat{v_t}}+\epsilon$ 缩放，出现了如下问题：
+
+- 权重衰减受自适应学习率的影响，不同参数的衰减强度不同，导致调参麻烦
+- 泛化性能一般
+
+**AdamW**在此基础上把正则项和梯度更新分开了，取得了更好的效果：
+
+$$
+\begin{aligned}
+&g_t = \nabla_\theta\mathcal{L}(\theta_t)\\~\\
+&m_{t} = \beta_1m_{t-1} + (1-\beta_1)g_{t},\quad v_{t} = \beta_2v_{t-1} + (1-\beta_2)(g_{t}\odot g_{t})\\~\\
+&\hat{m_t} = \frac{m_t}{1-\beta_1^t},\quad \hat{v_t} = \frac{v_t}{1-\beta_2^t}\\~\\
+&\theta_{t+1} = \theta_t - \frac{\eta}{\sqrt{\hat{v_t}}+\epsilon}\hat{m_t}-\eta\lambda\theta_t
+\end{aligned}
+$$

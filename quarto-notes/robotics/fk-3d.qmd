@@ -1,0 +1,577 @@
+---
+title: "三维机械臂正运动学"
+author: "Jiacheng Zhang"
+date: 2026-06-05
+description: "介绍三维机械臂的正运动学"
+categories:
+  - "机器人学"
+  - "优化问题"
+---
+
+在上一讲中，我们简要介绍了平面机械臂的正运动学及其求解方法，而接下来要介绍的三维情况，则远远比二维复杂：
+
+在三维空间中，机械臂可以看成由若干个刚体连杆通过关节依次连接形成的运动链。所谓刚体，是指在运动过程中自身形状和尺寸不发生变化的物体，也就是说刚体上任意两点之间的距离始终保持不变。因此，在机器人建模中，我们通常不关心连杆本身如何变形，而只关心不同连杆之间通过关节产生的相对运动。
+
+关节决定了两个刚体之间允许发生怎样的相对运动。最常见的关节有两类：**旋转关节（Revolute Joint）** 和 **移动关节（Prismatic Joint）**。旋转关节允许连杆绕某条轴线转动，关节变量是角度；移动关节允许连杆沿某条轴线平移，关节变量是位移。
+
+因此，一个 3D 机械臂的运动可以理解为：机械臂的基座固定在空间中，从基座开始，每经过一个关节，就发生一次相对旋转或平移，最后得到末端执行器在三维空间中的位置和姿态。
+
+与平面机械臂不同，3D 机械臂描述朝向更为复杂。为了处理复杂的空间几何结构，我们会为每一个连杆定义一个局部坐标系，将整个机械臂复杂的正运动学问题，拆解成了多个简化的子问题，此时我们只需即求解相邻两根连杆之间的关系。
+
+读者可以直观地理解为，知道上一个连杆的末端位置与姿态与当前杆的状态，我们可以求解当前杆的末端位置与姿态。
+
+
+为了便于理解，先引入如下概念：
+
+## Denavit-Hartenberg 参数法
+
+**Denavit-Hartenberg 参数法**是一种用来描述机械臂几何结构和求正运动学的方法。它的核心思想是给机械臂的每个连杆建立一个坐标系，然后用 4 个参数描述相邻两个坐标系之间的相对位置和姿态。
+
+### 轴线（Joint axis）
+
+机械臂的关节运动需要参考线，例如旋转需要知道绕什么轴，平移需要知道沿什么轴。在日常生活中：
+
+- 门的开关涉及到旋转，它相对于门框绕着转动的轴就是轴线
+- 抽屉的抽拉涉及到平移，它相对于桌面的平移方向就是轴线
+
+对于机械臂来讲，我们要研究的是当前杆 $i$ 相对于上一根杆 $i-1$ 相对运动，因此可以定义为：
+
+- **旋转关节**的轴线是两根连杆发生相对旋转的旋转中心线
+- **移动关节**的轴线是两根连杆相对平移（滑动）的直线运动方向
+
+对于平面机械臂而言也存在轴线，只是其每个旋转关节的轴线都垂直于平面：
+
+![[images/pasted-image-20260605155646.png|300]]
+
+
+由于关节的轴线只有平面位置的区别，平面机械臂的正运动学非常简单，然而在3D机械臂中，各个关节的轴线有可能是异面直线，两根轴线之间有**扭转和偏移**，这导致我们要用更多的参数来描述杆与杆之间的关系：
+
+![[images/pasted-image-20260605155316.png|400]]
+
+
+如图是两个旋转关节，由连杆 $i-1$ 连接，该连杆会绕着轴线 $i-1$ 旋转。
+
+
+### 建立坐标系
+
+在三维机械臂中，每个关节都有自己的轴线。因此，如果想描述整条机械臂的空间结构，仅仅知道有关节还不够，还需要知道这些轴线之间的相对位置和方向。
+
+为了系统地描述这种关系，我们通常为**每根连杆 $i$ 建立一个坐标系 $\{i\}$**，该坐标系是被刚性固定在连杆 $i$ 上的，即随着连杆运动。
+
+![[images/pasted-image-20260605163202.png|500]]
+
+
+如图是建系示例，我们有如下规定：
+
+- 坐标系 $\{i\}$ 的 $\hat{Z}$ 轴与关节的轴线重合，方向可以自定
+-  $\hat{X}$ 轴的方向是相邻两根轴线的公垂线 $a_{i}$ 方向，一般指向下一个关节
+-  $\hat{Y}$ 轴的方向是通过 $\hat{Z}$ 轴与 $\hat{X}$ 轴的右手定则确立的
+
+当两根轴线相交，此时 $a_i=0$，一般取垂直于该平面的法线为 $\hat{X}$ 轴
+
+
+### 连杆长度 $a_{i-1}$
+
+有了上述坐标系的直观后， 我们可以定义一些机械臂的描述量。第 $i-1$ 根杆的**连杆长度**被定义为关节$i-1$ 与关节 $i$ 的轴线的公垂线长度 $a_{i-1}$，注意这是一个运动学上的量，要与实际的连杆形状、长度区别开。
+
+当两根轴线共面时，连杆长度 $a_{i-1}=0$
+
+![[images/pasted-image-20260605170649.png|450]]
+
+
+### 扭转角 $\alpha_{i-1}$
+
+扭转角 $\alpha_{i-1}$ 定义为从​ $\hat{Z}_{i-1}$ 轴旋转到 $\hat{Z}_{i}$ 轴的角度，且该角度是绕着 $\hat{X}_{i-1}$ 轴测量的。也可以理解为把两根轴投影到法线是 $\hat{X}_{i-1}$ 的平面，并按右手定则计算两个投影直线的夹角。
+
+### 连杆偏距 $d_i$
+
+第 $i$ 根连杆的偏距 $d_i$ 定义为上一根连杆的 $\hat{X}_{i-1}$ 轴到当前连杆的 $\hat{X}_{i}$ 轴的距离，方向沿 $\hat{Z}_{i}$ 轴正向。也可以理解为相邻连杆（长度所在直线）沿公共轴线方向的距离。
+
+### 关节角 $\theta_i$
+
+第 $i$ 根连杆的关节角 $\theta_i$ 定义为上一根连杆的 $\hat{X}_{i-1}$ 轴到绕 $\hat{Z}_i$ 轴旋转到当前连杆的 $\hat{X}_{i}$ 轴的角度，方向遵循右手定则。
+
+### 一般约定
+
+当公共关节为旋转关节时，关节角 $\theta$ 为关节运动变量，连杆偏距 $d$ 为常量；当公共关节为移动关节时，连杆偏距 $d$ 为关节运动变量，关节角 $\theta$ 为常量。
+
+位于运动链两端的连杆 $0$ 和连杆 $n$ 只有一端存在关节轴，故连杆长度 $a$ 和连杆扭转角 $\alpha$ 按习惯设定为 $0$。相应地，关节 $1$ 和关节 $n$ 也缺乏一侧的连杆长度作为参照，故关节运动变量的零点可以根据实际情况任意选取，另一个连接关系中的常量则按习惯设定为 $0$。
+
+实际中为了方便，将 $\{0\}$ 作为参考坐标系（保持静止不变），其 $\hat{Z}_0$ 轴方向与 $\hat{Z}_1$ 保持一致，并且还要保证在关节 $1$ 的运动变量为零时，坐标系$\{0\}$ 与坐标系 $\{1\}$ 完全重合。
+
+末端连杆坐标系的 $\hat{X}$ 轴会选取关节角为0的方向。
+
+如图是二维机械臂的建系，所有旋转关节的轴线垂直于平面。可以注意基座坐标系和最后一根连杆坐标系的确立：
+
+![[images/pasted-image-20260605174053.png|300]]
+
+
+现在我们已经引入了D-H参数法的四个参数：对于连杆 $i-1$，它的连杆长度和扭转角分别是 $a_{i-1}$ 和 $\alpha_{i-1}$；而与它相邻的第 $i$ 个关节对应的关节角和偏距是 $\theta_i$ 和 $d_i$。
+我们利用如下的记号描述连杆 $i-1$ 及其相邻关节 $i$：
+$$
+(a_{i-1},\alpha_{i-1},d_i,\theta_i)
+$$
+接下来我们会了解这四个参数在正运动学求解中的强大之处。
+
+## 旋转坐标系
+
+### 平面机械臂
+
+先用一个简单的例子来了解为什么要用 D-H 参数法，以平面机械臂RRR为例：
+
+![[images/pasted-image-20260605174053.png|300]]
+
+
+这里一共有三根连杆，有一个基座坐标系 $\{0\}$，每根连杆有一个坐标系 $\{i\}$。
+
+每根连杆的末端位置，在其自身的坐标系中容易表示：
+
+$$
+r_i =
+\begin{bmatrix}
+a_i\\
+0
+\end{bmatrix}
+$$
+这里的连杆长度就是实际的杆长 $l_i$
+
+但这个并不是在世界坐标系（此处即基座坐标系）的表示，注意到 $\{1\}$ 相对于 $\{0\}$ 逆时针旋转了 $\theta_1$，$\{2\}$ 相对于 $\{1\}$ 逆时针旋转了 $\theta_2$，$\{3\}$ 相对于 $\{2\}$ 逆时针旋转了 $\theta_3$
+
+因此 $\{3\}$ 相对于基座坐标系逆时针旋转了 $\theta_1+\theta_2+\theta_3$
+
+我们希望把在 $\{3\}$ 坐标系下的末端表示变成世界坐标系的表示
+
+不妨先考虑杆 $1$ 末端位置的转换，由于坐标系 $\{1\}$ 相对世界坐标系逆时针转了 $\theta_1$，把其末端表示逆时针旋转 $\theta_1$ ：
+
+$$
+r^{\text{world}}_1 = R(\theta_1)r_1 = \begin{bmatrix}\cos \theta &-\sin \theta\\
+\sin \theta & \cos \theta\end{bmatrix} \begin{bmatrix} a_i\\0 \end{bmatrix}=\begin{bmatrix}a_i \cos\theta\\a_i\sin \theta \end{bmatrix}
+$$
+由于两个坐标系的原点一样，平移量为 $0$ ：
+$$
+p_0 = \begin{bmatrix} 0\\0\end{bmatrix}
+$$
+从而在世界坐标系中的杆 $1$ 末端位置为：
+
+$$
+p_1 = p_0 + r^{\text{world}}_1 = \begin{bmatrix}a_i \cos\theta\\a_i\sin \theta \end{bmatrix}
+$$
+
+这和我们直观得到的是一致的，其他杆的末端位置同理也可以求得
+
+我们可以用一种更简便的写法来表示上述的旋转和平移变换，定义一个矩阵 ${}^{0}_{1}T$，它表示$\{1\}$相对于 $\{0\}$ 的位姿：
+
+$$
+{}^{0}_{1}T= \begin{bmatrix}
+\cos \theta_1 &-\sin \theta_1 &a_0\\
+\sin\theta_1 & \cos \theta_1& 0\\
+0&0&1
+\end{bmatrix}
+$$
+注意此时两个坐标系重合，有 $a_0 = 0$，同理有 $\{2\}$ 相对于 $\{1\}$：
+$$
+{}^{1}_{2}T= \begin{bmatrix}
+\cos \theta_2 &-\sin \theta_2 &a_1\\
+\sin\theta_2 & \cos \theta_2& 0\\
+0&0&1
+\end{bmatrix}
+$$
+
+则 $\{2\}$ 相对于 $\{0\}$的位姿是二者的连乘：
+
+$$
+{}^{0}_{2}T = {}^{0}_{1}T {}^{1}_{2}T =
+\begin{bmatrix}
+\cos (\theta_1+\theta_2) &-\sin (\theta_1+\theta_2) &a_1\cos\theta_1\\
+\sin(\theta_1+\theta_2) & \cos (\theta_1+\theta_2)& a_1\sin\theta_1\\
+0&0&1
+\end{bmatrix}
+$$
+
+这个矩阵定义的好处在于，我们可以通过不断连乘来得到每根杆坐标系相对于基座坐标系的位姿
+
+
+### 三维机械臂
+
+上述的例子给了我们一个启发，可以通过旋转和平移坐标系来求解末端位置。只是三维的情况更复杂一点，回忆
+$$
+(\alpha_{i-1},a_{i-1},\theta_i,d_i)
+$$
+实际上它们就是**坐标系 $\{i-1\}$ 变换到坐标系 $\{i\}$ 所需要的四个子运动**：
+
+- $\alpha_{i-1}$ 是 $\hat{Z}_{i-1}$  绕着 $\hat{X}_{i-1}$ 旋转到 $\hat{Z}_{i}$ 的角度
+- $a_{i-1}$ 是 $\hat{Z}_{i-1}$  沿着 $\hat{X}_{i-1}$ 平移到 $\hat{Z}_{i}$ 的距离
+- $\theta_i$ 是 $\hat{X}_{i-1}$  绕着 $\hat{Z}_{i}$ 旋转到 $\hat{X}_{i}$ 的角度
+- $d_i$ 是 $\hat{X}_{i-1}$  沿着 $\hat{Z}_{i}$ 平移到 $\hat{X}_{i}$ 的距离
+
+
+因此我们可以定义四个矩阵，它们分别代表这四个子运动：
+
+$$
+\begin{aligned}
+R_x(\alpha) &=
+\begin{bmatrix}
+1& 0&0&0\\
+0&\cos\alpha &-\sin\alpha&0\\
+0&\sin\alpha&\cos\alpha&0\\
+0&0&0&1
+\end{bmatrix}
+\qquad
+T_x(a) = \begin{bmatrix}
+1& 0&0&a\\
+0&1&0&0\\
+0&0&1&0\\
+0&0&0&1
+\end{bmatrix}
+\\[0.4em]
+R_z(\theta) &=
+\begin{bmatrix}
+\cos\theta &-\sin\theta&0&0\\
+\sin\theta&\cos\theta&0&0\\
+0& 0&1&0\\
+0&0&0&1
+\end{bmatrix}
+\qquad
+T_z(d) = \begin{bmatrix}
+1& 0&0&0\\
+0&1&0&0\\
+0&0&1&d\\
+0&0&0&1
+\end{bmatrix}
+\end{aligned}
+$$
+
+因此从坐标系 $\{i\}$ 相对于 $\{i-1\}$ 的位姿可以定义为一个矩阵：
+
+$$
+\begin{aligned}
+{}^{i-1}_{i}T &= R_x(\alpha_{i-1})T_x(a_{i-1})R_z(\theta_i)T_z(d_i)\\[0.4em]
+&=\begin{bmatrix}
+\cos\theta_i & -\sin\theta_i & 0 & a_{i-1}\\
+\cos\alpha_{i-1}\sin\theta_i & \cos\alpha_{i-1}\cos\theta_i & -\sin\alpha_{i-1} & -d_i\sin\alpha_{i-1}\\
+\sin\alpha_{i-1}\sin\theta_i & \sin\alpha_{i-1}\cos\theta_i & \cos\alpha_{i-1} & d_i\cos\alpha_{i-1}\\
+0&0&0&1
+\end{bmatrix}
+\end{aligned}
+$$
+
+进而我们可以通过连乘，直接求得：
+$$
+{}^{0}_{n}T = {}^{0}_{1}T{}^{1}_{2}T\cdots{}^{n-1}_{n}T
+$$
+
+下面我们以PUMA560的位姿计算为例，为符号的简便，我们以 $c$ 表示 $\cos$ ，$s$ 表示 $\sin$：
+
+![[images/pasted-image-20260606213436.png|299]]
+
+![[images/pasted-image-20260606213813.png|300]]
+
+
+先列出D-H参数表：
+
+| 编号  | $\alpha_{i-1}$ | $a_{i-1}$ | $\theta_i$ | $d_i$ |
+| --- | -------------- | --------- | ---------- | ----- |
+| 1   | $0$            | $0$       | $\theta_1$ | 0     |
+| 2   | $-90^\degree$  | $0$       | $\theta_2$ | 0     |
+| 3   | $0$            | $a_2$     | $\theta_4$ | $d_3$ |
+| 4   | $-90^\degree$  | $a_3$     | $\theta_4$ | $d_4$ |
+| 5   | $90^\degree$   | $0$       | $\theta_5$ | $0$   |
+| 6   | $-90^\degree$  | $0$       | $\theta_6$ | $0$   |
+
+我们可以依次写出齐次变换矩阵：
+$$
+\begin{aligned}
+{}^0_1T&=\begin{bmatrix}
+c\theta_1&-s\theta_1& 0 &0\\
+s\theta_1 & c\theta_1 &  0& 0\\
+0&0&1&0\\
+0&0&0&1
+\end{bmatrix}
+
+,\qquad
+{}^1_2T=\begin{bmatrix}
+c\theta_2&-s\theta_2& 0 &0\\
+0 & 0&  1& 0\\
+-s\theta_2&-c\theta_2&0&0\\
+0&0&0&1
+\end{bmatrix}\\[0.4em]
+
+{}^2_3T&=\begin{bmatrix}
+c\theta_3&-s\theta_3& 0 &a_2\\
+s\theta_2&-c\theta_2&  0& 0\\
+0&0&1&d_3\\
+0&0&0&1
+\end{bmatrix}
+,\qquad
+{}^3_4T=\begin{bmatrix}
+c\theta_4&s\theta_4& 0 &a_3\\
+0 & 0&  1& d_4\\
+-s\theta_4&-c\theta_4&0&0\\
+0&0&0&1
+\end{bmatrix}\\[0.4em]
+
+{}^4_5T&=\begin{bmatrix}
+c\theta_5&-s\theta_5& 0 &0\\
+0&0&  -1& 0\\
+s\theta_5&c\theta_5&0&0\\
+0&0&0&1
+\end{bmatrix}
+,\qquad
+{}^6_5T=\begin{bmatrix}
+c\theta_6&-s\theta_6& 0 &0\\
+0&0&  1& 0\\
+-s\theta_6&-c\theta_6&0&0\\
+0&0&0&1
+\end{bmatrix}
+
+\end{aligned}
+$$
+
+最后连乘可以得到：
+$$
+{}^{0}_{6}T=
+\begin{bmatrix}
+r_{11} & r_{12} & r_{13} & p_x \\
+r_{21} & r_{22} & r_{23} & p_y \\
+r_{31} & r_{32} & r_{33} & p_z \\
+0 & 0 & 0 & 1
+\end{bmatrix}
+$$
+其中：
+$$
+\begin{aligned}
+r_{11} &= c_1\left[c_{23}(c_4c_5c_6 - s_4s_6) - s_{23}s_5c_6\right]
+       + s_1(s_4c_5c_6 + c_4s_6), \\
+r_{21} &= s_1\left[c_{23}(c_4c_5c_6 - s_4s_6) - s_{23}s_5c_6\right]
+       - c_1(s_4c_5c_6 + c_4s_6), \\
+r_{31} &= -s_{23}(c_4c_5c_6 - s_4s_6) - c_{23}s_5c_6, \\[0.8em]
+r_{12} &= c_1\left[c_{23}(-c_4c_5s_6 - s_4c_6) + s_{23}s_5s_6\right]
+       + s_1(c_4c_6 - s_4c_5s_6), \\
+r_{22} &= s_1\left[c_{23}(-c_4c_5s_6 - s_4c_6) + s_{23}s_5s_6\right]
+       - c_1(c_4c_6 - s_4c_5s_6), \\
+r_{32} &= -s_{23}(-c_4c_5s_6 - s_4c_6) + c_{23}s_5s_6, \\[0.8em]
+r_{13} &= -c_1(c_{23}c_4s_5 + s_{23}c_5) - s_1s_4s_5, \\
+r_{23} &= -s_1(c_{23}c_4s_5 + s_{23}c_5) + c_1s_4s_5, \\
+r_{33} &= s_{23}c_4s_5 - c_{23}c_5, \\[0.8em]
+p_x &= c_1(a_2c_2 + a_3c_{23} - d_4s_{23}) - d_3s_1, \\
+p_y &= s_1(a_2c_2 + a_3c_{23} - d_4s_{23}) + d_3c_1, \\
+p_z &= -a_3s_{23} - a_2s_2 - d_4c_{23}
+\end{aligned}
+$$
+
+
+实际计算中，我们往往会用四元数来表示旋转矩阵，从而可以解决欧拉角参数化万向锁的问题。
+
+在mujoco仿真中，利用存储的**MjData**即可快速得到坐标：
+
+![[images/piper_demo.gif]]
+
+
+此处在原xml文件的基础上增加了site（图中的小蓝点）作为模型的一部分：
+
+```python
+
+import argparse
+import math
+from pathlib import Path
+import time
+
+import mujoco
+import numpy as np
+
+PROJECT_DIR = Path(__file__).resolve().parent
+PIPER_SCENE = PROJECT_DIR / "agilex_piper" / "scene.xml"
+EE_SITE = "ee_site"
+GRIPPER_ACTUATOR = "gripper"
+
+
+TRACE_RGBA = np.array([1.0,0.2,0.0, 1.0], dtype = np.float32)
+TRACE_RADIUS = 0.004
+MAX_TRACE_POINT = 0
+
+
+def body_ids(model: mujoco.MjModel, names: list[str]) -> list[tuple[str, int]]:
+    ids = []
+    for name in names:
+        body_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, name)
+        if body_id < 0:
+            raise ValueError(f"body not found: {name}")
+        ids.append((name, body_id))
+    return ids
+
+
+def site_id(model: mujoco.MjModel, name: str) -> int:
+    site = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SITE, name)
+    if site < 0:
+        raise ValueError(f"site not found: {name}")
+    return site
+
+
+def actuator_id(model: mujoco.MjModel, name: str) -> int:
+    actuator = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, name)
+    if actuator < 0:
+        raise ValueError(f"actuator not found: {name}")
+    return actuator
+
+
+def reset_home(model: mujoco.MjModel, data: mujoco.MjData) -> None:
+    key_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_KEY, "home")
+    if key_id >= 0:
+        mujoco.mj_resetDataKeyframe(model, data, key_id)
+    else:
+        mujoco.mj_resetData(model, data)
+
+def draw_trace(viewer, points: list[np.ndarray]) -> None:
+    if len(points) < 2:
+        return
+
+    max_segments = min(len(points) - 1, viewer.user_scn.maxgeom)
+
+    with viewer.lock():
+        viewer.user_scn.ngeom = 0
+        cam = viewer.cam
+        print(
+          f"lookat={cam.lookat.copy()}, "
+          f"distance={cam.distance:.4f}, "
+          f"azimuth={cam.azimuth:.4f}, "
+          f"elevation={cam.elevation:.4f}",
+          flush=True,
+        )
+        for i in range(max_segments):
+            p0 = points[i]
+            p1 = points[i + 1]
+
+            geom = viewer.user_scn.geoms[i]
+            mujoco.mjv_initGeom(
+                geom,
+                mujoco.mjtGeom.mjGEOM_CAPSULE,
+                np.array([TRACE_RADIUS, 0.0, 0.0], dtype=np.float64),
+                np.zeros(3, dtype=np.float64),
+                np.eye(3, dtype=np.float64).reshape(9),
+                TRACE_RGBA,
+            )
+            mujoco.mjv_connector(
+                geom,
+                mujoco.mjtGeom.mjGEOM_CAPSULE,
+                TRACE_RADIUS,
+                p0,
+                p1,
+            )
+
+        viewer.user_scn.ngeom = max_segments
+
+def print_positions(
+    data: mujoco.MjData,
+    ee_site_id: int,
+    tracked_bodies: list[tuple[str, int]],
+) -> None:
+    values = []
+    x, y, z = data.site_xpos[ee_site_id]
+    values.append(f"{EE_SITE}=({x:.4f}, {y:.4f}, {z:.4f})")
+
+    for name, body_id in tracked_bodies:
+        x, y, z = data.xpos[body_id]
+        values.append(f"{name}=({x:.4f}, {y:.4f}, {z:.4f})")
+    print(f"t={data.time:6.3f}s | " + "  ".join(values), flush=True)
+
+def apply_demo_motion(model: mujoco.MjModel, data: mujoco.MjData, home_ctrl) -> None:
+    t = data.time
+    data.ctrl[:] = home_ctrl
+
+    joint1 = actuator_id(model, "joint1")
+    joint2 = actuator_id(model, "joint2")
+    joint3 = actuator_id(model, "joint3")
+    joint4 = actuator_id(model, "joint4")
+    joint5 = actuator_id(model, "joint5")
+    gripper = actuator_id(model, GRIPPER_ACTUATOR)
+
+    data.ctrl[joint1] = home_ctrl[joint1] + math.sin(0.7 * t)
+    data.ctrl[joint2] = home_ctrl[joint2] + 0.45 * math.sin(0.5 * t)
+    data.ctrl[joint3] = home_ctrl[joint3] + 0.25 * math.sin(0.8 * t)
+    data.ctrl[joint4] = home_ctrl[joint4] + 0.45 * math.sin(1.0 * t)
+    data.ctrl[joint5] = home_ctrl[joint5] + 0.30 * math.sin(0.9 * t)
+
+    # PiPER gripper is position-controlled through joint7.
+    # 0.035 is open, 0.0 is closed. joint8 follows joint7 through equality.
+    data.ctrl[gripper] = 0.0175
+
+def run(
+    headless: bool,
+    demo: bool,
+    seconds: float | None,
+    interval: float,
+    body_names: list[str],
+) -> None:
+    model = mujoco.MjModel.from_xml_path(str(PIPER_SCENE))
+    data = mujoco.MjData(model)
+    reset_home(model, data) # 恢复到home状态
+    home_ctrl = data.ctrl.copy()       # 复制home
+    tracked_bodies = body_ids(model, body_names)
+    ee_site_id = site_id(model, EE_SITE)
+
+    print(f"xml: {PIPER_SCENE}")
+    print(f"tracking: {EE_SITE} from data.site_xpos")
+    if body_names:
+        print(f"extra bodies: {', '.join(body_names)}")
+
+    next_print_time = 0.0
+    trace_points:list[np.ndarray] = []
+
+    if headless:
+        duration = 5.0 if seconds is None else seconds
+        while data.time < duration:
+            if demo:
+                apply_demo_motion(model, data, home_ctrl)
+            mujoco.mj_step(model, data)
+
+            if data.time >= next_print_time:
+                print_positions(data, ee_site_id, tracked_bodies)
+                next_print_time += interval
+        return
+
+    from mujoco import viewer as mujoco_viewer
+
+    with mujoco_viewer.launch_passive(model, data) as viewer:
+        while viewer.is_running() and (seconds is None or data.time < seconds):
+            step_start = time.time()
+
+            if demo:
+                apply_demo_motion(model, data, home_ctrl)
+            trace_points.append(data.site_xpos[ee_site_id].copy())
+            mujoco.mj_step(model, data)
+            if len(trace_points) > MAX_TRACE_POINT:
+                trace_points.pop(0)
+            draw_trace(viewer,trace_points)
+            viewer.sync()
+
+            if data.time >= next_print_time:
+                print_positions(data, ee_site_id, tracked_bodies)
+                next_print_time += interval
+
+            sleep_time = model.opt.timestep - (time.time() - step_start)
+            if sleep_time > 0:
+                time.sleep(sleep_time)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Simulate PiPER and print live body positions")
+
+    parser.add_argument("--demo", action="store_true", help="move joints and gripper")
+    parser.add_argument("--seconds", type=float, default=None, help="simulation duration")
+    parser.add_argument("--interval", type=float, default=0.2, help="print interval in seconds")
+    parser.add_argument("--bodies", nargs="*", default=[], help="extra body names to print")
+    args = parser.parse_args()
+
+    run(
+        headless=args.headless,
+        demo=args.demo,
+        seconds=args.seconds,
+        interval=args.interval,
+        body_names=args.bodies,
+    )
+
+
+if __name__ == "__main__":
+    main()
+
+```
