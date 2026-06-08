@@ -96,7 +96,6 @@ $$
 
 $$
 q_m = W_q e_m, \quad k_m = W_k e_m, \quad v_m = W_v e_m
-
 $$
 
 一般地，取 $W_{q/k/v}\in \mathbb{R}^{\frac{d}{H}\times d}\sim  \mathcal{N}(0,\sigma^2)$ ，此处的 $H$ 指多头注意力的头数。

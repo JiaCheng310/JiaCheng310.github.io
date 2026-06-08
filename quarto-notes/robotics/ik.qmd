@@ -605,7 +605,6 @@ l_1s_2\dot{\theta_1} \\l_1c_2\dot{\theta_1}\\0
 \end{aligned}
 $$
 最终我们可以得到：
-
 $$
 \begin{aligned}
 {}^3v_3 &= {}^3_2R({}^2v_2 + {}^2w_2\times {}^{2}P_3 ) = \begin{bmatrix}
@@ -633,6 +632,5 @@ l_1c_1\dot{\theta}_1 + l_2c_{12}(\dot{\theta}_1+\dot{\theta}_2)\\
 \end{bmatrix}
 \end{aligned}
 $$
-
 #### Jacob矩阵
 
