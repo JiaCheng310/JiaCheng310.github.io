@@ -552,7 +552,87 @@ $$
 
 
 联系上一章的内容，我们先写出几个齐次变换矩阵：
-$$
 
 $$
+\begin{aligned}
+
+{}^1_0T &= \begin{bmatrix}
+c_1& -s_1 & 0 & 0\\
+s_1 & c_1 & 0 & 0\\
+0 & 0 & 1& 0\\
+0& 0& 0 & 1
+\end{bmatrix}
+
+,\quad
+{}^2_1T = \begin{bmatrix}
+c_2& -s_2 & 0 & l_1\\
+s_2 & c_2 & 0 & 0\\
+0 & 0 & 1& 0\\
+0& 0& 0 & 1
+\end{bmatrix}
+\\~\\
+
+{}^3_2T &= \begin{bmatrix}
+1& 0 & 0 & l_2\\
+0& 1 & 0 & 0\\
+0 & 0 & 1& 0\\
+0& 0& 0 & 1
+\end{bmatrix}
+
+\end{aligned}
+$$
+
+由于基座坐标系始终不变，有 ${}^0 v_0 =[0,0,0]^\top,\quad {}^0w_0 = [0,0,0]^\top$   根据上述传递公式：
+$$
+\begin{aligned}
+{}^1v_1 &= {}^1_0R({}^0v_0 + {}^0w_0\times {}^{0}P_1 ) = \begin{bmatrix}
+0\\0\\0
+\end{bmatrix}\\
+{}^1w_1 &= {}^1_0R{}^0w_0 + \dot{\theta}_1\hat{Z}_1 = \begin{bmatrix}
+0\\0\\ \dot{\theta}_1
+\end{bmatrix}
+\end{aligned}
+$$
+进一步传递：
+$$
+\begin{aligned}
+{}^2v_2 &= {}^2_1R({}^1v_1 + {}^1w_1\times {}^{1}P_2 ) = \begin{bmatrix}
+l_1s_2\dot{\theta_1} \\l_1c_2\dot{\theta_1}\\0
+\end{bmatrix}\\~\\
+{}^2w_2 &= {}^2_1R{}^1w_1 + \dot{\theta}_2\hat{Z}_2 = \begin{bmatrix}
+0\\0\\ \dot{\theta}_1+\dot{\theta}_2
+\end{bmatrix}
+\end{aligned}
+$$
+最终我们可以得到：
+
+$$
+\begin{aligned}
+{}^3v_3 &= {}^3_2R({}^2v_2 + {}^2w_2\times {}^{2}P_3 ) = \begin{bmatrix}
+l_1s_2\dot{\theta_1} \\l_1c_2\dot{\theta_1}+l_2(\dot{\theta}_1+\dot{\theta}_2)\\0
+\end{bmatrix}\\~\\
+{}^3w_3 &= {}^3_2R{}^2w_2  = 
+{}^2w_2
+\end{aligned}
+$$
+
+注意我们此时计算出的是 $\{3\}$ 的原点在 $\{3\}$ 中表示的线速度，还要通过旋转矩阵转换到 $\{0\}$ 中：
+
+$$
+\begin{aligned}
+{}^3_0R &= {}^1_0R{}^2_1R{}^3_2R = \begin{bmatrix}
+c_{12} & - s_{12} & 0\\
+s_{12} & c_{12} &  0\\
+0 & 0 & 1
+\end{bmatrix}
+\\~\\
+{}^0v_3 &= {}^3_0R{}^3v_3 = \begin{bmatrix}
+-l_1s\dot{\theta}_1-l_2s_{12}(\dot{\theta}_1+\dot{\theta}_2)\\
+l_1c_1\dot{\theta}_1 + l_2c_{12}(\dot{\theta}_1+\dot{\theta}_2)\\
+0
+\end{bmatrix}
+\end{aligned}
+$$
+
+#### Jacob矩阵
 
