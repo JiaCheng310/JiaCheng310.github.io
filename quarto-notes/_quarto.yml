@@ -6,6 +6,7 @@ project:
     - "robotics/*.qmd"
     - "deep-learning/*.qmd"
   resources:
+    - "favicon.svg"
     - "robotics/images/**"
     - "deep-learning/images/**"
 
@@ -36,6 +37,7 @@ format:
 website:
   title: "Jiacheng's Notes"
   site-url: "https://jiacheng310.github.io/notes/"
+  favicon: "favicon.svg"
   search: true
   page-navigation: true
   navbar:
