@@ -91,3 +91,66 @@ table td {
 .callout-important {
   border-radius: 0;
 }
+
+.obsidian-callout {
+  --callout-accent: #4f7cff;
+  --callout-bg: color-mix(in srgb, var(--callout-accent) 9%, transparent);
+  margin: 1.1rem 0;
+  padding: 0.85rem 1rem;
+  border-left: 4px solid var(--callout-accent);
+  background: var(--callout-bg);
+  border-radius: 8px;
+}
+
+.obsidian-callout-title {
+  margin-bottom: 0.35rem;
+  color: var(--callout-accent);
+  font-weight: 700;
+}
+
+.obsidian-callout-title p,
+.obsidian-callout-content p:last-child {
+  margin-bottom: 0;
+}
+
+.obsidian-callout-note,
+.obsidian-callout-info {
+  --callout-accent: #3a86ff;
+}
+
+.obsidian-callout-tip,
+.obsidian-callout-success,
+.obsidian-callout-check,
+.obsidian-callout-done {
+  --callout-accent: #1f9d68;
+}
+
+.obsidian-callout-warning,
+.obsidian-callout-caution,
+.obsidian-callout-attention {
+  --callout-accent: #d97706;
+}
+
+.obsidian-callout-danger,
+.obsidian-callout-error,
+.obsidian-callout-failure,
+.obsidian-callout-fail,
+.obsidian-callout-missing,
+.obsidian-callout-bug {
+  --callout-accent: #dc2626;
+}
+
+.obsidian-callout-question,
+.obsidian-callout-help,
+.obsidian-callout-faq {
+  --callout-accent: #8b5cf6;
+}
+
+.obsidian-callout-example {
+  --callout-accent: #0f766e;
+}
+
+.obsidian-callout-quote,
+.obsidian-callout-cite {
+  --callout-accent: #6b7280;
+}

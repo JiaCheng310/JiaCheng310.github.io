@@ -13,25 +13,30 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "quarto-notes/deep-learning/positional-encoding-why.qmd",
+                "file": "quarto-notes/robotics/fk-3d.qmd",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "positional-encoding-why"
+              "title": "fk-3d"
             }
           },
           {
-            "id": "5fc2e676e5f501f5",
+            "id": "7d969b1166256a42",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "quarto-notes/robotics/ik.qmd",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "新标签页"
+              "title": "ik"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -195,32 +200,33 @@
       "qmd-as-md-obsidian:Render Quarto to PDF": false
     }
   },
-  "active": "fbadd17e8b61cbfc",
+  "active": "7d969b1166256a42",
   "lastOpenFiles": [
-    "quarto-notes/deep-learning/index.qmd",
-    "quarto-notes/robotics/ik.qmd",
-    "index.md",
-    "index 1.md",
-    "README.md",
-    "quarto-notes/index.qmd",
-    "quarto-notes/README.md",
+    "quarto-notes/robotics/images/ik_dynamic.gif",
+    "quarto-notes/robotics/images/ik_inversebad.gif",
     "quarto-notes/robotics/fk-3d.qmd",
-    "quarto-notes/robotics/optimization.qmd",
-    "quarto-notes/deep-learning/positional-encoding-sinusoidal.qmd",
-    "quarto-notes/robotics/index.qmd",
     "quarto-notes/robotics/fk-2d.qmd",
+    "quarto-notes/robotics/ik.qmd",
+    "quarto-notes/robotics/images/ik_inverse.gif",
     "quarto-notes/_site/listings.json",
     "quarto-notes/_site/search.json",
+    "quarto-notes/_site/robots.txt",
+    "quarto-notes/_site/sitemap.xml",
+    "quarto-notes/_site/styles.css",
     "quarto-notes/_site/robotics/images/piper_demo.gif",
     "quarto-notes/_site/robotics/images/pasted-image-20260607213343.png",
     "quarto-notes/_site/robotics/images/pasted-image-20260607205048.png",
     "quarto-notes/_site/robotics/images/pasted-image-20260607202240.png",
-    "quarto-notes/_site/deep-learning/images/plot3.jpg",
-    "quarto-notes/_site/deep-learning/images/pasted-image-20260603212529.png",
-    "quarto-notes/_site/deep-learning/images/pasted-image-20260603210610.png",
-    "quarto-notes/_site/deep-learning/images/pasted-image-20260520160004.png",
-    "quarto-notes/_site/deep-learning/images/pasted-image-20260517140903.png",
-    "quarto-notes/_site/deep-learning/images/pasted-image-20260519155004.png",
+    "quarto-notes/_site/robotics/images/pasted-image-20260607162635.png",
+    "quarto-notes/_site/robotics/images/pasted-image-20260607154823.png",
+    "quarto-notes/_site/robotics/images/pasted-image-20260606213813.png",
+    "quarto-notes/_site/favicon.svg",
+    "quarto-notes/_site/site_libs/quarto-html/tabsets/tabsets.js",
+    "quarto-notes/_site/site_libs/quarto-search/quarto-search.js",
+    "index.md",
+    "index 1.md",
+    "README.md",
+    "quarto-notes/README.md",
     "content/posts/机器人学笔记（四）：逆运动学（Inverse Kinematics）/index.md",
     "_legacy-hugo-notes/几种常见的优化器/index.md",
     "_legacy-hugo-notes/机器人学笔记（三）：三维机械臂正运动学（Foward Kinematics）/index.md",

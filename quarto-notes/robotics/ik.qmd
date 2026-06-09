@@ -15,7 +15,6 @@ $$
  但是在实际机器人任务中，我们往往不是先知道关节角，而是先知道希望末端到达的位置。例如希望机械臂末端移动到桌面上的某个点，或者希望夹爪以某个姿态靠近物体。
 
 此时问题变成：已知目标末端位姿 $p$，如何求出对应的关节角 $x$ ：
-
 $$
  x = f^{-1}(p)
 $$
@@ -212,21 +211,29 @@ Craig书中的PUMA560机械臂求解例子，此时后腕点正好是后三轴�
 关于PUMA560的IK解析解法，涉及到求逆较为复杂，可以参考Craig的机器人导论，本文不再赘述。
 
 
-### 数值法
+### 数值法基础
 
 #### 动起来的机械臂
 
-首先回到我们最初尝试解决的问题，已知末端位姿，想要反求关节角：
+首先回到我们最初尝试解决的问题，已知目标末端位姿，想要反求关节变量。为避免把关节空间和任务空间混在一起，后面统一使用：
+
+- $q$ 表示关节变量
+- ${}^0p_e(q)$ 表示末端位置
+- $x_e(q)$ 表示任务空间位姿
+
+正运动学可以写成：
 
 $$
-x = f^{-1}(p)
+x_e = f(q)
 $$
+
+逆运动学则是在给定目标任务空间位姿 $x_d$ 时，求一个满足 $x_e(q)\approx x_d$ 的关节构型 $q$。
 
 实际应用中解析法很可能不满足或极难求解，与其考虑一次得到方程的闭式解，我们能不能通过数值的方式逐步逼近目标？
 
-例如当前关节角为 $x_k$，目标位姿是 $p_d$ ，通过正运动学我们可以得到当前的末端位姿：
+例如当前关节构型为 $q_k$，目标位姿是 $x_d$，通过正运动学可以得到当前的末端位姿：
 $$
-p_k = f(x_k)
+x_e(q_k) = f(q_k)
 $$
 只要我们可以衡量两个位姿之间的误差，并通过某种方式不断改变关节角缩小误差，就可以达到求解的目的，我们先引入下面的概念：
 
@@ -556,7 +563,7 @@ $$
 $$
 \begin{aligned}
 
-{}^1_0T &= \begin{bmatrix}
+{}^0_1T &= \begin{bmatrix}
 c_1& -s_1 & 0 & 0\\
 s_1 & c_1 & 0 & 0\\
 0 & 0 & 1& 0\\
@@ -564,7 +571,7 @@ s_1 & c_1 & 0 & 0\\
 \end{bmatrix}
 
 ,\quad
-{}^2_1T = \begin{bmatrix}
+{}^1_2T = \begin{bmatrix}
 c_2& -s_2 & 0 & l_1\\
 s_2 & c_2 & 0 & 0\\
 0 & 0 & 1& 0\\
@@ -572,7 +579,7 @@ s_2 & c_2 & 0 & 0\\
 \end{bmatrix}
 \\~\\
 
-{}^3_2T &= \begin{bmatrix}
+{}^2_3T &= \begin{bmatrix}
 1& 0 & 0 & l_2\\
 0& 1 & 0 & 0\\
 0 & 0 & 1& 0\\
@@ -597,7 +604,7 @@ $$
 $$
 \begin{aligned}
 {}^2v_2 &= {}^2_1R({}^1v_1 + {}^1w_1\times {}^{1}P_2 ) = \begin{bmatrix}
-l_1s_2\dot{\theta_1} \\l_1c_2\dot{\theta_1}\\0
+l_1s_2\dot{\theta}_1 \\l_1c_2\dot{\theta}_1\\0
 \end{bmatrix}\\~\\
 {}^2w_2 &= {}^2_1R{}^1w_1 + \dot{\theta}_2\hat{Z}_2 = \begin{bmatrix}
 0\\0\\ \dot{\theta}_1+\dot{\theta}_2
@@ -608,7 +615,7 @@ $$
 $$
 \begin{aligned}
 {}^3v_3 &= {}^3_2R({}^2v_2 + {}^2w_2\times {}^{2}P_3 ) = \begin{bmatrix}
-l_1s_2\dot{\theta_1} \\l_1c_2\dot{\theta_1}+l_2(\dot{\theta}_1+\dot{\theta}_2)\\0
+l_1s_2\dot{\theta}_1 \\l_1c_2\dot{\theta}_1+l_2(\dot{\theta}_1+\dot{\theta}_2)\\0
 \end{bmatrix}\\~\\
 {}^3w_3 &= {}^3_2R{}^2w_2  = 
 {}^2w_2
@@ -619,18 +626,420 @@ $$
 
 $$
 \begin{aligned}
-{}^3_0R &= {}^1_0R{}^2_1R{}^3_2R = \begin{bmatrix}
+{}^0_3R &= {}^0_1R{}^1_2R{}^2_3R = \begin{bmatrix}
 c_{12} & - s_{12} & 0\\
 s_{12} & c_{12} &  0\\
 0 & 0 & 1
 \end{bmatrix}
 \\~\\
-{}^0v_3 &= {}^3_0R{}^3v_3 = \begin{bmatrix}
--l_1s\dot{\theta}_1-l_2s_{12}(\dot{\theta}_1+\dot{\theta}_2)\\
+{}^0v_3 &= {}^0_3R{}^3v_3 = \begin{bmatrix}
+-l_1s_1\dot{\theta}_1-l_2s_{12}(\dot{\theta}_1+\dot{\theta}_2)\\
 l_1c_1\dot{\theta}_1 + l_2c_{12}(\dot{\theta}_1+\dot{\theta}_2)\\
 0
 \end{bmatrix}
 \end{aligned}
 $$
-#### Jacob矩阵
 
+#### Jacobian 矩阵
+
+令平面 RR 机械臂的关节变量为：
+
+$$
+q =
+\begin{bmatrix}
+\theta_1\\
+\theta_2
+\end{bmatrix},
+\qquad
+\dot{q} =
+\begin{bmatrix}
+\dot{\theta}_1\\
+\dot{\theta}_2
+\end{bmatrix}
+$$
+
+由上面的 ${}^0v_3$ 可以看到，末端速度可以写成关节速度 $\dot{\theta}_1$ 和 $\dot{\theta}_2$ 的线性组合（因为是平面的，此时我们简写考虑二维）：
+
+$$
+{}^0v_3 = \begin{bmatrix}
+-l_1\sin\theta_1 - l_2\sin(\theta_1+\theta_2)\\
+l_1\cos\theta_1 + l_2 \cos(\theta_1+\theta_2)
+\end{bmatrix}
+\dot{\theta}_1
++
+\begin{bmatrix}
+ - l_2\sin(\theta_1+\theta_2)\\
+ l_2 \cos(\theta_1+\theta_2)
+\end{bmatrix}
+\dot{\theta}_2
+$$
+
+抽象出来就是，每个关节速度对末端速度都有一个贡献，末端速度就是这两个贡献的叠加。不妨写成矩阵形式：
+$$
+{}^0v_3 = {}^0J_v(q)\begin{bmatrix}
+\dot{\theta}_1\\
+\dot{\theta}_2
+\end{bmatrix}
+=
+\begin{bmatrix}
+-l_1\sin\theta_1 - l_2\sin(\theta_1+\theta_2)& - l_2\sin(\theta_1+\theta_2)\\
+l_1\cos\theta_1 + l_2 \cos(\theta_1+\theta_2) & l_2 \cos(\theta_1+\theta_2)
+\end{bmatrix}\begin{bmatrix}
+\dot{\theta}_1\\
+\dot{\theta}_2
+\end{bmatrix}
+$$
+
+回想我们在正运动学中得到的：
+$$
+\begin{aligned}
+&{}^0p_e(q)=
+\begin{bmatrix}
+p_x(q)\\
+p_y(q)
+\end{bmatrix}\\[0.4em]
+&p_x(q) = l_1\cos(\theta_1)+l_2\cos(\theta_1+\theta_2)\\
+&p_y(q) = l_1\sin(\theta_1)+l_2\sin(\theta_1+\theta_2)
+\end{aligned}
+$$
+不难注意到：
+
+$$
+{}^0J_v(q) = \frac{\partial {}^0p_e(q)}{\partial q}
+= \begin{bmatrix}
+\frac{\partial p_x}{\partial \theta_1} & \frac{\partial p_x}{\partial \theta_2}\\
+\frac{\partial p_y}{\partial \theta_1} & \frac{\partial p_y}{\partial \theta_2}
+\end{bmatrix}
+$$
+
+这就是线速度雅可比矩阵，它描述了关节速度如何被映射为末端线速度。（注意我们没考虑角速度，即对姿态还没要求）。进一步，雅可比矩阵可以理解为正运动学的局部线性近似：
+$$
+{}^0p_e = f_p(q)
+$$
+当关节变量发生一个很小的变化 $\Delta q$ 时：
+$$
+\Delta {}^0p_e \approx {}^0J_v(q)\Delta q
+$$
+即在当前机械臂姿态下，每个关节角发生微小变化时，末端位置会向哪个方向变化、变化多少
+
+当然我们此处还没考虑姿态，以平面机械臂为例，进一步考虑角速度：
+
+$$
+\begin{bmatrix}
+\dot{p}_x\\
+\dot{p}_y\\
+\dot{\phi}
+\end{bmatrix}= J(q)\begin{bmatrix}
+\dot{\theta}_1\\
+\dot{\theta}_2
+\end{bmatrix}
+=
+\begin{bmatrix}
+-l_1\sin\theta_1 - l_2\sin(\theta_1+\theta_2)& - l_2\sin(\theta_1+\theta_2)\\
+l_1\cos\theta_1 + l_2 \cos(\theta_1+\theta_2) & l_2 \cos(\theta_1+\theta_2)\\
+1& 1
+\end{bmatrix}\begin{bmatrix}
+\dot{\theta}_1\\
+\dot{\theta}_2
+\end{bmatrix}
+$$
+
+
+那么这个矩阵的作用是什么呢，我们不妨反过来思考。设想达到的目标任务空间位姿是 $x_d$，当前构型是 $q_k$，则当前位姿和目标误差是：
+$$
+e_x = x_d - x_e(q_k)
+$$
+我们希望可以找到一个关节增量满足：
+$$
+J_x(q_k)\Delta q \approx e_x
+$$
+这就把之前的非线性求解问题近似转换为了：
+
+$$
+J(q_k)\Delta q \approx x_d - x_e(q_k)
+$$
+这就是后续数值法的基本思想。
+
+值得注意的是，此处的减法只是一种误差的记号，位置误差可以直接相减来衡量，但姿态误差不应该直接相减。一个直观的例子是平面机械臂，假如有两种末端姿态，角度分别为：
+$$
+\phi_0 = 179^\degree,\quad \phi_1= -179^\degree
+$$
+我们先要从后一种姿态变成前一种姿态，倘若我们直接相减来衡量误差：
+$$
+\phi_0 - \phi_1 = 358^\degree
+$$
+即从 $\phi_1$ 到 $\phi_0$ 要逆时针转 $358^\degree$，然而实际上这两种姿态只相差了 $2^\degree$ ，说明直接相减是不合适的。
+
+常用的一种做法是：
+$$
+e_{\phi} = \text{Atan2}(\sin(\phi_0-\phi_1),\cos(\phi_0-\phi_1))
+$$
+其天然地把角度限制在 $[-\pi,\pi]$  
+
+对于三维的情况，我们用三维旋转矩阵来表示姿态，之前提及的四元数表示和旋转矩阵等价，例如单位四元数 $ai + bj + ck +d$ 对应的旋转矩阵为：
+
+$$
+R = \begin{bmatrix}
+1 - 2(b^2 + c^2) & 2(ab - cd) & 2(ac + bd) \\
+2(ab + cd) & 1 - 2(a^2 + c^2) & 2(bc - ad) \\
+2(ac - bd) & 2(bc + ad) & 1 - 2(a^2 + b^2)
+\end{bmatrix}
+$$
+
+互为相反数的两个单位四元数对应同一个旋转矩阵，事实上单位四元数群 $S^3$ 是旋转群 $SO(3)$ 的双覆盖。（后续可能会展开介绍这方面）
+
+总之，我们下面以三维旋转矩阵来表示姿态，如上所述，用相减来表示是不合适的，如何衡量二者的误差呢？我们要引入一部分流形的知识：
+
+$$
+SO(3) = \{R\in \mathbb{R}^3| R^\top R =I ,\text{det}(R) =1\}
+$$
+
+是一个三维的光滑流形（同时也是李群），每个旋转矩阵是这个流形上的一个点。在欧式空间中，我们衡量两点的距离可以作差，但衡量流形上两点距离的标准方法是 **测地距离 (geodesic distance)**，即连接两点的最短路径的长度。
+
+例如在球面上，两个点的最短距离不是穿过球面的线段，而是沿着球面的圆弧：
+
+![[Pasted image 20260609160858.png|400]]
+
+
+假如我们当前姿态是 $R$ ，想要到达的姿态是 $R_d$ ，我们希望找到一个 旋转矩阵 $R_{\text{err}}$ ，使得：
+$$
+R_d = R_{\text{err}}R
+$$
+由于旋转矩阵的正交性 $R^\top R =I$ ：
+$$
+R_{\text{err}} = R_dR^{-1} = R_dR^\top
+$$
+
+可以把 $R_{\text{err}}$ 看作一个相对旋转矩阵，即从 $R$ 到 $R_d$ 还需要的相对旋转。但 $R_{\text{err}} \in SO(3)$ ，便于上述的求解，还要转换为三维的姿态误差向量，即绕某根轴旋转的角度，设：
+$$
+R_{\text{err}} = \begin{bmatrix}
+r_{11} & r_{12} & r_{13}\\
+r_{21} & r_{22}& r_{23}\\
+r_{31} & r_{32}  & r_{33}
+\end{bmatrix}
+$$
+一般公式如下：
+$$
+\begin{aligned}
+\theta &= \cos^{-1}(\frac{\text{tr}(R_{\text{err}})-1}{2})\\~\\
+u & = \frac{1}{2\sin\theta}\begin{bmatrix}
+r_{32} -r_{23}\\
+r_{13} - r_{31}\\
+r_{21}- r_{12}
+\end{bmatrix}
+
+\end{aligned}
+$$
+则三维的姿态误差向量为：
+$$
+e_{R} = \theta u
+$$
+上述的操作也可以用一个函数来表示：
+
+$$
+e_R = \text{Log}(R_{\text{err}}) =\text{Log}(R_dR^\top)
+$$
+
+此处的 $\text{Log}$ 读者不必过分在意其含义，当成函数即可，事实上它是将流形上的误差投影到切空间。
+
+在正式介绍数值法之前，我们先了解下雅可比矩阵的几种求法：
+
+
+**一、FK求偏导**
+
+即我们上述运用的方法，先得到正运动学的函数 $f(q)$ ，再对各个关节变量求偏导。但这种方法适用简单的例子，在复杂机械臂中的不常用。
+
+
+**二、逐列构造**
+
+我们先计算出每个连杆坐标系相对于基座坐标系的位姿：
+$$
+{}^0_iT = \begin{bmatrix}
+{}^0_i R & {}^0p_i\\
+0 & 1
+\end{bmatrix}
+$$
+其中 ${}^0p_i$ 是坐标系 $\{i\}$ 的原点在基座坐标系中的表示，${}^0p_e$ 是末端点在基座坐标系中的位置。
+
+**1.第 $i$ 个关节是转动关节**
+
+则其对末端角速度的贡献为：
+$$
+{}^0\hat{Z}_i
+$$
+其对末端线速度的贡献为：
+$$
+{}^0\hat{Z}_i \times ({}^0p_e-{}^0p_i)
+$$
+则雅可比矩阵的第 $i$ 列为：
+
+$$
+J_i =\begin{bmatrix}
+{}^0\hat{Z}_i \times ({}^0p_e-{}^0p_i)\\
+{}^0\hat{Z}_i
+\end{bmatrix}
+$$
+
+**2.第 $i$ 个关节是移动关节**
+
+对末端角速度的贡献为$0$，其对末端线速度的贡献为：
+$$
+{}^0\hat{Z}_i 
+$$
+则雅可比矩阵的第 $i$ 列为：
+$$
+J_i =\begin{bmatrix}
+{}^0\hat{Z}_i\\
+0
+
+\end{bmatrix}
+$$
+
+下面我们叙述雅可比矩阵的参考系变换，已知参考系为 $\{B\}$ 的雅可比矩阵为：
+
+$$
+\begin{bmatrix}
+{}^Bv\\
+{}^B w
+\end{bmatrix}
+=
+{}^BJ(q)\dot{q}
+$$
+
+假如我们想要知道其在 $\{A\}$ 中的表示，由于：
+
+$$
+\begin{bmatrix}
+{}^Av\\
+{}^A w
+\end{bmatrix}
+= 
+\begin{bmatrix}
+{}^A_BR&0\\
+0&{}^A_BR
+\end{bmatrix}
+\begin{bmatrix}
+{}^Bv\\
+{}^B w
+\end{bmatrix}
+$$
+进一步可以得到：
+
+$$
+\begin{bmatrix}
+{}^Av\\
+{}^A w
+\end{bmatrix}
+=
+\begin{bmatrix}
+{}^A_BR&0\\
+0&{}^A_BR
+\end{bmatrix}
+{}^BJ(q)\dot{q}
+$$
+
+那么在新的参考系 $\{A\}$ 表示的雅可比矩阵就是：
+
+$$
+{}^AJ(q)=\begin{bmatrix}
+{}^A_BR&0\\
+0&{}^A_BR
+\end{bmatrix}{}^BJ(q)
+$$
+
+### 数值法
+
+下面我们正式开始了解几类简单的数值法，核心围绕：
+
+$$
+J(q_k)\Delta q \approx e_x
+$$
+#### Jacobian Inverse IK
+
+最直接的方法是求逆，如果 $J(q)$ 是**方阵且可逆**，可以直接求逆：
+$$
+\Delta q = J^{-1}(q_k)e_x
+$$
+随后再逐步更新：
+$$
+q_{k+1} = q_{k}+\alpha \Delta q= q_{k}+\alpha J^{-1}(q_k)(x_d - f(q_k))
+$$
+
+但对 $J(q)$ 过于严苛，现实中很难满足
+
+
+### Jacobian Transpose IK
+
+我们也可以把上面的问题看作优化一个误差函数：
+$$
+E(q) = \frac{1}{2} \|x_d-f(q)\|^2 = \frac{1}{2} \|e_x\|^2$$
+对 $q$ 求梯度有：
+$$
+\nabla E(q) = -J(q)^\top e_x
+$$
+利用梯度下降，可以把更新写为：
+$$
+q_{k+1} = q_k + \alpha J^\top(q_k)e_x
+$$
+
+这种方法对 $J(q)$ 要求低，但缺点是对学习率敏感，可以参考之前的优化器笔记。
+
+
+
+
+#### Jacobian Pseudoinverse IK
+
+可以把上式看作一个最小二乘的优化问题：
+$$
+\Delta q = \text{arg}\min_{\Delta q} \|J(q_k)\Delta q - e_x \|^2
+$$
+根据我们之前推导的结果：
+$$
+\Delta q = J^\dagger(q_k)e_x
+$$
+则可以把更新写为：
+$$
+q_{k+1} = q_k + \alpha J^\dagger(q_k)e_x
+$$
+
+这种伪逆的方法在 $J(q)$ 不是方阵或不可逆的时候都适用。然而在接近**奇异位形（Singular Configuration）** 时，Jacobian 的某些奇异值趋近于 0，$\|J(q)^\dagger\| \rightarrow \infty$  ，从而需要的关节速度无穷大，导致失效。
+
+
+#### Dampled Least Squares
+
+为了缓解上述问题，可以引入阻尼项：
+
+$$
+\Delta q = \text{arg}\min_{\Delta q} \|J(q_k)\Delta q - e_x \|^2+\lambda^2\|\Delta q\|^2
+$$
+和岭回归的形式是一样的，其解为：
+$$
+\Delta q = (J^\top J + \lambda ^2I)^{-1}J^\top e_x
+$$
+则可以把更新写为：
+
+$$
+q_{k+1} = q_k + \alpha (J^\top J + \lambda ^2I)^{-1}J^\top e_x
+$$
+
+这个正则项会惩罚关节速度过大的更新，从而一定程度上缓解奇异位形的问题
+
+
+下面我们简单看看几种方法比较：
+
+转置法对学习率敏感，很可能出现学习慢或者震荡的问题，下列分别是学习率为 $0.02$ 和 $0.2$ 的情形：
+
+```{=html}
+<div style="display:flex; gap:1rem; justify-content:center; align-items:flex-start; flex-wrap:wrap; margin:1.2rem 0;">
+  <img src="images/ik_transpose.gif" alt="学习率为 0.02 的 Jacobian Transpose IK" style="flex:1 1 320px; max-width:500px; width:100%; height:auto;">
+  <img src="images/ik_transpose0.2.gif" alt="学习率为 0.2 的 Jacobian Transpose IK" style="flex:1 1 320px; max-width:400px; width:100%; height:auto;">
+</div>
+```
+
+如果用伪逆，大部分情况下较为稳定且收敛快：
+![[ik_inverse.gif|500]]
+但可能会在奇异位形附近出现数值不稳定的问题：
+![[ik_inversebad.gif|500]]
+
+利用前文提到的阻尼最小二乘可以缓解这个问题：
+![[ik_dynamic.gif|500]]
