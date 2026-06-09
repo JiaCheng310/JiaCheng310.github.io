@@ -28,7 +28,7 @@ format:
       margin-width: 250px
     css: styles.css
     toc: true
-    toc-depth: 3
+    toc-depth: 4
     number-sections: false
     syntax-highlighting: github
     code-copy: true

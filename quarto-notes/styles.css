@@ -58,6 +58,28 @@ figcaption,
   color: #6b7280;
 }
 
+.obsidian-image-row {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin: 1.2rem 0;
+}
+
+.obsidian-image-row-item {
+  flex: 1 1 calc(50% - 0.5rem);
+  min-width: 260px;
+  text-align: center;
+}
+
+.obsidian-image-row-item img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
 pre {
   white-space: pre-wrap;
   overflow-wrap: anywhere;

@@ -798,7 +798,7 @@ $$
 
 例如在球面上，两个点的最短距离不是穿过球面的线段，而是沿着球面的圆弧：
 
-![[Pasted image 20260609160858.png|400]]
+![[images/Pasted image 20260609160858.png|400]]
 
 
 假如我们当前姿态是 $R$ ，想要到达的姿态是 $R_d$ ，我们希望找到一个 旋转矩阵 $R_{\text{err}}$ ，使得：
@@ -954,6 +954,7 @@ $$
 $$
 J(q_k)\Delta q \approx e_x
 $$
+
 #### Jacobian Inverse IK
 
 最直接的方法是求逆，如果 $J(q)$ 是**方阵且可逆**，可以直接求逆：
@@ -968,7 +969,7 @@ $$
 但对 $J(q)$ 过于严苛，现实中很难满足
 
 
-### Jacobian Transpose IK
+#### Jacobian Transpose IK
 
 我们也可以把上面的问题看作优化一个误差函数：
 $$
@@ -1029,20 +1030,20 @@ $$
 
 转置法对学习率敏感，很可能出现学习慢或者震荡的问题，下列分别是学习率为 $0.02$ 和 $0.2$ 的情形：
 
-```{=html}
-<div style="display:flex; gap:1rem; justify-content:center; align-items:flex-start; flex-wrap:wrap; margin:1.2rem 0;">
-  <img src="images/ik_transpose.gif" alt="学习率为 0.02 的 Jacobian Transpose IK" style="flex:1 1 320px; max-width:500px; width:100%; height:auto;">
-  <img src="images/ik_transpose0.2.gif" alt="学习率为 0.2 的 Jacobian Transpose IK" style="flex:1 1 320px; max-width:400px; width:100%; height:auto;">
-</div>
-```
+![[images/ik_transpose.gif|500]]
+![[images/ik_transpose0.2.gif|400]]
 
 如果用伪逆，大部分情况下较为稳定且收敛快：
-![[ik_inverse.gif|500]]
+
+![[images/ik_inverse.gif|500]]
+
 但可能会在奇异位形附近出现数值不稳定的问题：
-![[ik_inversebad.gif|500]]
+
+![[images/ik_inversebad.gif|500]]
 
 利用前文提到的阻尼最小二乘可以缓解这个问题：
-![[ik_dynamic.gif|500]]
+
+![[images/ik_dynamic.gif|500]]
 
 ```python
 
