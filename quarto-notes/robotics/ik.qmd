@@ -1027,13 +1027,6 @@ $$
 这个正则项会惩罚关节速度过大的更新，从而一定程度上缓解奇异位形的问题
 
 
-#### Weighted 
-
-
-
-
-
-
 
 下面我们简单看看几种方法比较：
 
@@ -1053,6 +1046,74 @@ $$
 利用前文提到的阻尼最小二乘可以缓解这个问题：
 
 ![[images/ik_dynamic.gif|500]]
+
+#### Weighted IK
+
+有时我们会更关注位置和姿态误差两者间的一个，或希望某些关节尽可能少动，这就引出了下面的：
+$$
+\begin{aligned}
+\Delta q &= \text{arg}\min_{\Delta q} \|J(q_k)\Delta q - e_x \|_W^2+\lambda^2\|\Delta q\|_H^2\\
+& =  \text{arg}\min_{\Delta q} (J(q_k)\Delta q - e_x)^\top W(J(q_k)\Delta q - e_x)+\lambda^2\Delta q^\top H\Delta q\\
+\end{aligned}
+$$
+
+其中 $W$ 和 $H$ 分别控制任务空间权重和关节空间权重，前者权重大的项意味着更关注缩小该项误差，后者权重大的项意味着惩罚该关节运动，希望减少其运动。
+
+更新公式为：
+$$
+ q_{k+1} = q_k + \alpha (J^\top W J +\lambda^2 H )^{-1}J^\top W e_x
+$$
+
+例如当我们关注姿态远远大于位置时，机械臂会优先满足姿态：
+
+![[ik_weighted1.gif|500]]
+
+而当我们希望第三根连杆尽可能少动时：
+
+![[ik_weighted2.gif|500]]
+
+#### Prioritized IK
+
+上述的加权偏向于软约束，有时我们希望机器人能完成多个任务，这些任务之间有优先级，例如：
+
+- **抓取目标**
+- **远离障碍物**
+
+其中抓取目标是主任务，次级任务是远离障碍物，它只能在不影响主任务的情况下做。这就衍生出了Prioritized IK：
+
+主任务：
+$$
+\begin{aligned}
+&J_1\Delta q\approx e_1\\~\\
+&\Delta q_1 = J_1^\dagger e_1
+\end{aligned}
+$$
+如果机器人有冗余自由度，那么还有一些关节运动不会影响主任务。这些运动在 $J_1$ 的零空间里。主任务零空间的投影矩阵为：
+$$
+N_1 = I - J_1^\dagger J_1
+$$
+我们就可以额外在零空间里做次级任务：
+$$
+\Delta q = \Delta q_1 + N_1 z
+$$
+如果次任务希望：
+$$
+J_2\Delta q \approx e_2
+$$
+则：
+$$
+\begin{aligned}
+&J_2(\Delta q_1 + N_1z) = e_2\\~\\
+&J_2N_1z = e_2-J_2\Delta q_1\\~\\
+&z = (J_2N_1)^\dagger( e_2-J_2\Delta q_1)
+\end{aligned}
+$$
+从而可以得到：
+$$
+\Delta q = \Delta q_1 + N_1(J_2N_1)^\dagger( e_2-J_2\Delta q_1)
+$$
+
+
 
 ```python
 
