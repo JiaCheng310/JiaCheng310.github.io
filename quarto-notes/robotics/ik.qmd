@@ -1043,3 +1043,135 @@ $$
 
 利用前文提到的阻尼最小二乘可以缓解这个问题：
 ![[ik_dynamic.gif|500]]
+
+```python
+
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+
+plt.rcParams["font.sans-serif"] = ["PingFang SC", "Heiti TC", "Arial Unicode MS"]
+plt.rcParams["axes.unicode_minus"] = False
+
+# fk为当前位姿，fd为目标位姿
+def logmap(fd, fk):
+	diff = np.zeros(3)
+	# 衡量位置误差
+	diff[:2] = fd[:2] - fk[:2]
+	# 对姿态角单独衡量误差，即前文所述的公式
+	diff[2] = np.imag(
+		np.log(np.exp(1j * (fd[-1] - fk[-1])))
+	)
+	return diff
+
+# 正运动学
+def fkin(q, param):
+	# 累计计算角度
+	L = np.tril(np.ones([param.nbVarX, param.nbVarX]))
+
+	f = np.stack([
+		param.l @ np.cos(L @ q),    # 末端 x 坐标
+		param.l @ np.sin(L @ q),    # 末端 y 坐标
+		np.mod(np.sum(q, 0) + np.pi, 2*np.pi) - np.pi   # 保证角度在-pi到pi
+	])
+	return f
+
+# 算每根机械臂末端的位置
+def fkin0(q, param):
+	L = np.tril(np.ones([param.nbVarX, param.nbVarX]))
+	f = np.vstack([
+		L @ np.diag(param.l) @ np.cos(L @ q),
+		L @ np.diag(param.l) @ np.sin(L @ q)
+	])
+	f = np.hstack([np.zeros([2, 1]), f])
+	return f
+
+# 算雅可比矩阵
+def Jkin(q, param):
+	L = np.tril(np.ones([param.nbVarX, param.nbVarX]))
+	J = np.vstack([
+		-np.sin(L @ q).T @ np.diag(param.l) @ L,
+		 np.cos(L @ q).T @ np.diag(param.l) @ L,
+		 np.ones([1, param.nbVarX])
+	])
+	return J
+
+
+param = lambda: None
+param.dt = 1e-2       # 每步时间 0.01 秒
+param.nbData = 80    # 迭代 80 次
+param.nbVarX = 3     # 3 个关节角
+param.nbVarU = 3     # 3 个关节速度控制量
+param.nbVarF = 3     # 末端目标三个维度： x, y, theta
+param.l = [2, 2, 1]  # 三根杆长度
+
+# 末端目标位姿
+fd = np.array([4.8, 0.2, 0.0])
+
+# 初始化关节角为[2pi/3,-pi/3,-pi/3]
+#q = -np.ones(param.nbVarX) * np.pi / param.nbVarX
+#q[0] += np.pi
+q = np.array([0.0, 0.001, -0.001])
+trace_x = []
+trace_y = []
+
+fig, ax = plt.subplots()
+ax.set_aspect('equal', adjustable='box')
+ax.set_xlim(-1.0, np.sum(param.l) + 0.6)
+ax.set_ylim(-2.5, np.sum(param.l) + 0.6)
+ax.grid(True, alpha=0.25)
+ax.set_title('Dampled Least Square')
+ax.set_xlabel('x')
+ax.set_ylabel('y')
+
+ax.scatter(fd[0], fd[1], color='red', marker='x', s=120, label='目标点')
+arm_line, = ax.plot([], [], '-o', color='black', linewidth=4, markersize=8, label='机械臂')
+trace_line, = ax.plot([], [], color='tab:orange', linewidth=2, label='末端轨迹')
+text = ax.text(0.02, 0.96, '', transform=ax.transAxes, va='top')
+ax.legend(loc='lower right')
+
+
+def update(frame):
+	global q
+
+	f = fkin(q, param)
+	J = Jkin(q, param)
+	error = logmap(fd, f)
+	# 伪逆法
+	#dq = np.linalg.pinv(J) @ error * 0.1 
+	# 转置法
+	#dq = J.T @ error * 0.2   
+	# 阻尼最小二乘
+	lam = 0.1
+	dq = J.T @ np.linalg.inv(J @ J.T + lam**2 * np.eye(3)) @ error * 0.1
+	q = q + dq
+ 
+	f_rob = fkin0(q, param)  # 每根连杆的末端位置
+
+	f_ee = fkin(q, param)      # 当前位姿
+
+	trace_x.append(f_ee[0])
+	trace_y.append(f_ee[1])
+
+	arm_line.set_data(f_rob[0, :], f_rob[1, :])
+	trace_line.set_data(trace_x, trace_y)
+	text.set_text(
+		f'迭代轮次: {frame+1}/{param.nbData}\n'
+		f'当前位姿: ({f_ee[0]:.3f}, {f_ee[1]:.3f}, {f_ee[2]:.3f})\n'
+		f'误差: {np.linalg.norm(error):.4f}'
+	)
+	return arm_line, trace_line, text
+
+
+ani = FuncAnimation(
+	fig,
+	update,
+	frames=param.nbData,
+	interval=80,
+	blit=True,
+	repeat=False
+)
+ani.save("ik_dynamic.gif", writer="pillow", fps=20)
+plt.show()
+
+```
