@@ -29,6 +29,37 @@
   margin-bottom: 0.8rem;
 }
 
+.quarto-title h1.title,
+main.content h2,
+main.content h3,
+main.content h4,
+main.content h5 {
+  color: #1f2937;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+
+main.content h2 {
+  margin-top: 2.2rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+main.content h3 {
+  margin-top: 1.9rem;
+}
+
+main.content h4 {
+  margin-top: 1.45rem;
+  color: #334155;
+}
+
+main.content h5 {
+  margin-top: 1.2rem;
+  color: #475569;
+  font-size: 1.02rem;
+}
+
 img {
   display: block;
   max-width: 100%;
