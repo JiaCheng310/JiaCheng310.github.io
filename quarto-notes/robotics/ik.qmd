@@ -1030,7 +1030,7 @@ $$
 
 转置法对学习率敏感，很可能出现学习慢或者震荡的问题，下列分别是学习率为 $0.02$ 和 $0.2$ 的情形：
 
-![[images/ik_transpose.gif|500]]
+![[images/ik_transpose.gif|400]]
 ![[images/ik_transpose0.2.gif|400]]
 
 如果用伪逆，大部分情况下较为稳定且收敛快：
