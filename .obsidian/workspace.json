@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "quarto-notes/robotics/ik.qmd",
+                "file": "quarto-notes/robotics/RRC.qmd",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "ik"
+              "title": "RRC"
             }
           },
           {
@@ -201,6 +201,11 @@
   },
   "active": "fbadd17e8b61cbfc",
   "lastOpenFiles": [
+    "quarto-notes/robotics/ik.qmd",
+    "quarto-notes/robotics/RRC.qmd",
+    "quarto-notes/robotics/images/RRC3d.gif",
+    "quarto-notes/robotics/images/ik_dynamic 2.gif",
+    "quarto-notes/robotics/optimization.qmd",
     "quarto-notes/_site/listings.json",
     "quarto-notes/_site/search.json",
     "quarto-notes/_site/robots.txt",
@@ -215,13 +220,8 @@
     "quarto-notes/_site/site_libs/quarto-html/tabsets/tabsets.js",
     "quarto-notes/_site/site_libs/quarto-html/popper.min.js",
     "quarto-notes/_site/site_libs/quarto-listing/quarto-listing.js",
-    "quarto-notes/_site/site_libs/quarto-listing/list.min.js",
-    "quarto-notes/_site/site_libs/clipboard/clipboard.min.js",
-    "quarto-notes/_site/site_libs/quarto-search/quarto-search.js",
     "quarto-notes/_site/deep-learning/images/pasted-image-20260603212529.png",
     "quarto-notes/_site/deep-learning/images/pasted-image-20260603210610.png",
-    "quarto-notes/_site/deep-learning/images/plot3.jpg",
-    "quarto-notes/_site/deep-learning/images/pasted-image-20260520160004.png",
     "quarto-notes/robotics/未命名.md",
     "index.md",
     "index 1.md",

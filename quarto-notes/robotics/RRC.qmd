@@ -84,9 +84,278 @@ $$
 
 下面的例子可以看到机械臂在初期的运动速度较快，后期则逐步变慢：
 ![[images/ik_RRCDLS2.gif|500]]
+![[RRC3d.gif|500]]
 
 ## RRC与IK的关系
 
 之前提到的IK是给定一个目标位姿 $x_d$ ，求解一个可以达到目标位姿的关节角 $q$，运用雅可比矩阵迭代求解，关注的是关节角增量 $\Delta q$，我们可以不严谨地称之为“**位置级IK**”
 
 但RRC是给定一个目标位姿 $x_d$，根据误差找出期望的末端速度 $\dot{x}_c$，关注求解关节速度 $\dot{q}$，它不直接求解关节角的增量，而是在一个控制周期内得到关节速度，并通过积分得到关节角增量。可以把RRC理解成一种速度层面的IK，称之为“**速度级IK**”
+
+
+
+###  代码
+
+下述代码出现了我们之前提及的关节角与转动关节变量之间的偏置和四元数的误差衡量，与旋转矩阵的差异不大，读者可自行了解：
+
+```python
+# 三维的机械臂 RRC + DLS
+import numpy as np
+import numpy.matlib
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+
+plt.rcParams["font.sans-serif"] = ["PingFang SC", "Heiti TC", "Arial Unicode MS"]
+plt.rcParams["axes.unicode_minus"] = False
+
+
+# 算误差和 Jacobian
+def f_reach(q, param):
+	f_tmp, _ = fkin(q, param)
+	error = logmap(param.Mu, f_tmp)
+	J = Jkin_num(q[:, 0], param)
+	return error, J
+
+# 计算整条机械臂上所有末端坐标系的位置和姿态
+def fkin(q, param):
+	# f[:, t] = [x, y, z, qw, qx, qy, qz]，每一列是一组末端位姿。
+	f = np.zeros((7, q.shape[1]))
+	R = np.zeros((3, 3, q.shape[1]))
+	for t in range(q.shape[1]):     # 对每个末端都算
+		f_tmp, R_tmp = fkin0(q[:, t], param)
+		R[:, :, t] = R_tmp[:, :, -1]         # 只取末端坐标系的旋转矩阵
+		f[0:3, t] = f_tmp[:, -1]               # 取出末端位姿
+		f[3:7, t] = R2q(R_tmp[:, :, -1])      # 旋转矩阵到四元数额转换
+	return f, R
+
+
+def dh_theta(q, param):
+	# DH矩阵实际使用的关节角：theta = q + theta_offset
+	# theta_offset是控制器零位和DH零位之间的固定角度偏置
+	# 最后一项0是末端固定段，不是主动关节
+	q_full = np.append(q, 0)
+	return q_full + param.dh.theta_offset
+
+
+def fkin0(q, param):
+	# 6个主动关节 + 1个末端固定段。
+	N = param.nbVarX + 1
+	theta = dh_theta(q, param)    # 注意这里是 q 加上偏置
+
+	# Tf是从base到当前坐标系的累计齐次变换
+	Tf = np.eye(4)
+	R = np.zeros((3, 3, N))
+	f = np.zeros((3, N + 1))
+	for n in range(N):
+		ct = np.cos(theta[n])
+		st = np.sin(theta[n])
+		ca = np.cos(param.dh.alpha[n])
+		sa = np.sin(param.dh.alpha[n])
+
+		# Modified DH 连乘
+		Tf = Tf @ [
+				[ct, -st, 0, param.dh.a[n]],
+				[st * ca, ct * ca, -sa, -param.dh.d[n] * sa],
+				[st * sa, ct * sa, ca, param.dh.d[n] * ca],
+				[0, 0, 0, 1],
+				]
+
+		# 保存当前坐标系在base坐标系下的姿态和位置。
+		R[:, :, n] = Tf[0:3, 0:3]
+		f[:, n + 1] = Tf[0:3, -1]    # 加1开始，0用来存base了
+	return f, R
+
+
+def Jkin_num(q, param):
+	eps = 1E-6
+
+	# 复制q 6 行 1 列 再转置：得到6列，每列都是q的矩阵
+	Q = np.matlib.repmat(q, param.nbVarX, 1).T
+	# 算六组一样的末端位姿
+	F1, _ = fkin(Q, param)
+
+	# 每一列只扰动一个关节变量，用有限差分近似df/dq
+	F2, _ = fkin(Q + np.eye(param.nbVarX) * eps, param)
+	# J是6x6的矩阵
+	J = logmap(F2, F1) / eps
+	return J
+
+
+def logmap(fd, f):
+	# 目标位姿fd和当前位姿f都是7维：[x,y,z,qw,qx,qy,qz]。
+	# 输出6维误差：[ex,ey,ez,erx,ery,erz]，方向是 目标 - 当前。
+	error = np.ndarray((6, f.shape[1]))
+	error[0:3, :] = fd[0:3, :] - f[0:3, :]   # 位置直接做作差就行
+	for t in range(f.shape[1]):
+		# 四元数的误差需要转换
+		error[3:6, t] = quat_error_to_rotvec(fd[3:7, t], f[3:7, t])
+	return error
+
+
+def quat_mul(q1, q2):
+	# 四元数乘法，格式都是[w,x,y,z]。
+	w1, x1, y1, z1 = q1
+	w2, x2, y2, z2 = q2
+	return np.array([
+		w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2,
+		w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2,
+		w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2,
+		w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2,
+	])
+
+
+def quat_conj(q):
+	# 单位四元数的逆等于共轭：[w,x,y,z]^{-1} = [w,-x,-y,-z]。
+	return np.array([q[0], -q[1], -q[2], -q[3]])
+
+# 衡量四元数的误差，输出三维姿态误差
+def quat_error_to_rotvec(q_target, q_current):
+	# 相对四元数：从当前姿态转到目标姿态。
+	q_err = quat_mul(q_target, quat_conj(q_current))
+	q_err = q_err / np.linalg.norm(q_err)
+
+	# q和-q表示同一个姿态。强制qw>=0，选择较短的旋转路径。
+	if q_err[0] < 0:
+		q_err = -q_err
+
+	angle = 2.0 * np.arctan2(np.linalg.norm(q_err[1:4]), q_err[0])
+	if angle < 1e-9:
+		return np.zeros(3)
+
+	axis = q_err[1:4] / np.linalg.norm(q_err[1:4])
+	return angle * axis
+
+
+def q2R(q):
+	# 四元数[w,x,y,z]转旋转矩阵。
+	return np.array([
+		[1.0 - 2.0 * q[2]**2 - 2.0 * q[3]**2, 2.0 * q[1] * q[2] - 2.0 * q[3] * q[0], 2.0 * q[1] * q[3] + 2.0 * q[2] * q[0]],
+		[2.0 * q[1] * q[2] + 2.0 * q[3] * q[0], 1.0 - 2.0 * q[1]**2 - 2.0 * q[3]**2, 2.0 * q[2] * q[3] - 2.0 * q[1] * q[0]],
+		[2.0 * q[1] * q[3] - 2.0 * q[2] * q[0], 2.0 * q[2] * q[3] + 2.0 * q[1] * q[0], 1.0 - 2.0 * q[1]**2 - 2.0 * q[2]**2],
+	])
+
+
+def R2q(R):
+	# 旋转矩阵转四元数[w,x,y,z]。
+	R = R.T
+	K = np.array([
+		[R[0, 0] - R[1, 1] - R[2, 2], R[1, 0] + R[0, 1], R[2, 0] + R[0, 2], R[1, 2] - R[2, 1]],
+		[R[1, 0] + R[0, 1], R[1, 1] - R[0, 0] - R[2, 2], R[2, 1] + R[1, 2], R[2, 0] - R[0, 2]],
+		[R[2, 0] + R[0, 2], R[2, 1] + R[1, 2], R[2, 2] - R[0, 0] - R[1, 1], R[0, 1] - R[1, 0]],
+		[R[1, 2] - R[2, 1], R[2, 0] - R[0, 2], R[0, 1] - R[1, 0], R[0, 0] + R[1, 1] + R[2, 2]],
+	]) / 3.0
+
+	e_val, e_vec = np.linalg.eig(K)
+	q = np.real([e_vec[3, np.argmax(e_val)], *e_vec[0:3, np.argmax(e_val)]])
+	return q
+
+
+def plot_coord_sys(ax, x, R, width=1):
+	# 红绿蓝三根线分别画目标/末端坐标系的x、y、z轴。
+	for t in range(x.shape[1]):
+		ax.plot([x[0, t], x[0, t] + R[0, 0, t]], [x[1, t], x[1, t] + R[1, 0, t]], [x[2, t], x[2, t] + R[2, 0, t]], linewidth=2 * width, color=[1.0, 0.0, 0.0])
+		ax.plot([x[0, t], x[0, t] + R[0, 1, t]], [x[1, t], x[1, t] + R[1, 1, t]], [x[2, t], x[2, t] + R[2, 1, t]], linewidth=2 * width, color=[0.0, 1.0, 0.0])
+		ax.plot([x[0, t], x[0, t] + R[0, 2, t]], [x[1, t], x[1, t] + R[1, 2, t]], [x[2, t], x[2, t] + R[2, 2, t]], linewidth=2 * width, color=[0.0, 0.0, 1.0])
+		ax.plot(x[0, t], x[1, t], x[2, t], 'o', markersize=8, color='black')
+
+
+param = lambda: None
+param.nbIter = 80
+param.nbVarX = 6
+param.nbVarU = param.nbVarX
+param.nbVarF = 7
+
+# 末端目标位姿：前三维是位置，后四维是四元数姿态
+target_R = q2R([np.cos(2 * np.pi / 5), 0.0, np.sin(2 * np.pi / 5), 0.0])
+fd = np.ndarray((param.nbVarF, 1))
+fd[0:3, 0] = [.28, .16, .32]
+fd[3:7, 0] = R2q(target_R)
+
+# 保存目标位姿
+param.Mu = fd
+param.MuR = np.dstack((target_R, target_R))
+
+# MDH参数
+param.dh = lambda: None
+param.dh.convention = 'm'
+param.dh.type = ['r'] * (param.nbVarX + 1)
+# 在FK小节中提及的关节角度偏置
+param.dh.theta_offset = np.array([0, -np.pi / 2, -np.pi / 2, 0, 0, 0, 0])
+param.dh.alpha = [0, -np.pi / 2, np.pi, np.pi / 2, np.pi / 2, -np.pi / 2, 0]
+param.dh.d = [0.2433, 0, 0, 0.2276, 0, 0.0615, 0]
+param.dh.a = [0, 0, 0.2, 0.087, 0, 0, 0]
+
+# 初始化关节角。
+q = np.zeros((param.nbVarX, 1))
+q0 = q.copy()
+
+trace_x = []
+trace_y = []
+trace_z = []
+
+fig = plt.figure(figsize=(7, 6))
+ax = fig.add_subplot(projection='3d')
+ax.set_xlim(-0.4, 0.4)
+ax.set_ylim(-0.4, 0.4)
+ax.set_zlim(0, 0.6)
+ax.set_xlabel('x')
+ax.set_ylabel('y')
+ax.set_zlabel('z')
+ax.set_title('带DLS的RRC')
+limits = np.array([getattr(ax, f'get_{axis}lim')() for axis in 'xyz'])
+ax.set_box_aspect(np.ptp(limits, axis=1))
+
+initial_points, _ = fkin0(q0.flatten(), param)
+ax.plot(initial_points[0, :], initial_points[1, :], initial_points[2, :], linewidth=3, color=[.8, .8, .8], label='初始姿态')
+plot_coord_sys(ax, fd, param.MuR * 0.1, width=1)
+
+robot_line, = ax.plot([], [], [], '-o', linewidth=4, markersize=6, color=[.2, .2, .2], label='当前机械臂')
+trace_line, = ax.plot([], [], [], color='tab:orange', linewidth=2, label='末端轨迹')
+text = ax.text2D(0.03, 0.95, '', transform=ax.transAxes)
+ax.legend(loc='upper right')
+
+
+def update(frame):
+	global q
+
+	f, _ = fkin(q, param)
+	J = Jkin_num(q.flatten(), param)
+	K = np.diag([10.0, 10.0, 10.0, 10.0, 10.0, 10.0])
+	error = logmap(fd, f)
+	lam = 0.1
+	xdot = K @ error
+	qdot = np.linalg.pinv(J.T@J + lam**2 * np.eye(6))@ J.T @ xdot
+	q += qdot * 0.01
+
+	# 更新后的关节位置用于绘图。
+	f_rob, _ = fkin0(q.flatten(), param)
+	f_ee, _ = fkin(q, param)
+
+	trace_x.append(f_ee[0, 0])
+	trace_y.append(f_ee[1, 0])
+	trace_z.append(f_ee[2, 0])
+
+	robot_line.set_data(f_rob[0, :], f_rob[1, :])
+	robot_line.set_3d_properties(f_rob[2, :])
+	trace_line.set_data(trace_x, trace_y)
+	trace_line.set_3d_properties(trace_z)
+	text.set_text(
+		f'迭代轮次: {frame + 1}/{param.nbIter}\n'
+		f'当前位姿: ({f_ee[0, 0]:.3f}, {f_ee[1, 0]:.3f}, {f_ee[2, 0]:.3f})\n'
+		f'误差范数: {np.linalg.norm(error):.5f}'
+	)
+	return robot_line, trace_line, text
+
+
+ani = FuncAnimation(
+	fig,
+	update,
+	frames=param.nbIter,
+	interval=100,
+	blit=False,
+	repeat=False,
+)
+plt.show()
+
+
+```
