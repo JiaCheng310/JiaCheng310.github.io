@@ -1214,7 +1214,7 @@ def update(frame):
 	#dq = J.T @ error * 0.2   
 	# 阻尼最小二乘
 	lam = 0.1
-	dq = J.T @ np.linalg.inv(J @ J.T + lam**2 * np.eye(3)) @ error * 0.1
+	dq = np.linalg.inv(J.T @ J + lam**2 * np.eye(3)) @ J.T @ error * 0.1
 	q = q + dq
  
 	f_rob = fkin0(q, param)  # 每根连杆的末端位置
