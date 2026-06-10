@@ -5,10 +5,12 @@ project:
     - "*.qmd"
     - "robotics/*.qmd"
     - "deep-learning/*.qmd"
+    - "reinforcement-learning/*.qmd"
   resources:
     - "favicon.svg"
     - "robotics/images/**"
     - "deep-learning/images/**"
+    - "reinforcement-learning/images/**"
 
 author: Jiacheng Zhang
 date-format: iso
@@ -75,3 +77,6 @@ website:
           - section: "Chapter 2: 优化算法"
             contents:
               - deep-learning/optimizers.qmd
+      - section: "Part 3: 强化学习"
+        contents:
+          - reinforcement-learning/index.qmd
