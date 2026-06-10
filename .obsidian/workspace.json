@@ -203,6 +203,9 @@
   "lastOpenFiles": [
     "quarto-notes/robotics/ik.qmd",
     "quarto-notes/robotics/RRC.qmd",
+    "quarto-notes/robotics/RRC.html",
+    "quarto-notes/robotics/RRC_files/mediabag",
+    "quarto-notes/robotics/RRC_files",
     "quarto-notes/robotics/images/ik_RRCDLS2.gif",
     "quarto-notes/robotics/images/ik_RRCDLS.gif",
     "quarto-notes/robotics/images/ik_dynamic 1.gif",
@@ -215,8 +218,6 @@
     "quarto-notes/robotics/images/ik_weighted1.gif",
     "quarto-notes/_site/listings.json",
     "quarto-notes/_site/search.json",
-    "quarto-notes/_site/robots.txt",
-    "quarto-notes/_site/sitemap.xml",
     "quarto-notes/_site/deep-learning/images/plot3.jpg",
     "quarto-notes/_site/deep-learning/images/pasted-image-20260603212529.png",
     "quarto-notes/_site/deep-learning/images/pasted-image-20260603210610.png",
