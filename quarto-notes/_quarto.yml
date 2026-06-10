@@ -66,7 +66,7 @@ website:
           - section: "Chapter 4: Resolved Rate Control"
             contents:
               - robotics/RRC.qmd
-      - section: "Part 2: 深度学习"
+      - section: "Part 2: 大模型杂谈"
         contents:
           - section: "Chapter 1: Transformer 基础"
             contents:
