@@ -46,12 +46,12 @@ $$
 $$
 e = x_d - f(q_k) = \begin{bmatrix}
 p_d - p_{q}\\
-\text{Log}(R_d^\top R_{q})
+\text{Log}(R_d R_{q}^\top)
 \end{bmatrix}
 $$
 期望的末端速度为：
 $$
-x_c = K(e) = K(x_d - f(q))
+\dot{x_c} = K(e) = K(x_d - f(q))
 $$
 再利用这个解出关节速度。
 
@@ -64,14 +64,14 @@ $K$ 的形式有（还有许多更复杂的形式，不一一介绍）：
 
 1. 在控制周期 $\Delta t$ 内，根据当前关节角 $q_k$ 算出末端位姿 $f(q_k)$ 
 2. 计算与目标位姿 $x_d$ 的误差，并利用增益 $K$ 计算理想速度 $x_c$
-3. 通过雅可比伪逆求解关节速度：$\dot{q_k} = J^\dagger(q_k)\dot{x}_c$
+3. 通过雅可比伪逆求解关节速度：$\dot q_k = J^\dagger(q_k)\dot{x}_c$
 4. 更新关节角：$q_{k+1} = q_k + \dot{q}_k \Delta t$
 5. 进入下一个控制周期，继续更新
 
 这样，机械臂不再是直接跳到某个 IK 解，而是以连续速度逐步靠近目标。为了缓解奇异位形的问题，通常会引入DLS：
 
 $$
-\dot{q_k} = (J(q_k)^\top J(q_k)+\lambda^2I)^{-1}J^\top(q_k)\dot{x}_c 
+\dot q_k = (J(q_k)^\top J(q_k)+\lambda^2I)^{-1}J^\top(q_k)\dot{x}_c 
 $$
 
 下面的例子可以看到机械臂在初期的运动速度较快，后期则逐步变慢：

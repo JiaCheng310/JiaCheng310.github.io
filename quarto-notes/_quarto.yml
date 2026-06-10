@@ -63,6 +63,9 @@ website:
           - section: "Chapter 3: Inverse Kinematics"
             contents:
               - robotics/ik.qmd
+          - section: "Chapter 4: Resolved Rate Control"
+            contents:
+              - robotics/RRC.qmd
       - section: "Part 2: 深度学习"
         contents:
           - section: "Chapter 1: Transformer 基础"
