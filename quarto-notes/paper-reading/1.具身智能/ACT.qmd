@@ -6,7 +6,7 @@ description: Learning Fine-Grained Bimanual Manipulation with  Low-Cost Hardware
 categories:
   - 论文精读
   - 具身智能
-draft: true
+draft: false
 ---
 
 ## 论文信息
