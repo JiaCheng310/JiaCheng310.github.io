@@ -111,7 +111,7 @@ website:
         contents:
           - text: "论文精读"
             href: "paper-reading/index.qmd"
-          - section: "1.文章与模板"
+          - section: "1.具身智能"
             contents:
-              - text: "论文精读模板"
-                href: "paper-reading/1.文章与模板/template.qmd"
+              - text: "ACT（Action Chunking Transformer）"
+                href: "paper-reading/1.具身智能/ACT.qmd"
