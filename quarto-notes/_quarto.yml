@@ -3,20 +3,21 @@ project:
   output-dir: _site
   render:
     - "*.qmd"
-    - "robotics/*.qmd"
-    - "robotics/*/*.qmd"
-    - "deep-learning/*.qmd"
-    - "deep-learning/*/*.qmd"
-    - "reinforcement-learning/*.qmd"
-    - "reinforcement-learning/*/*.qmd"
-    - "paper-reading/*.qmd"
-    - "paper-reading/*/*.qmd"
+    - "机器人学/*.qmd"
+    - "机器人学/*/*.qmd"
+    - "深度学习/*.qmd"
+    - "深度学习/*/*.qmd"
+    - "强化学习/*.qmd"
+    - "强化学习/*/*.qmd"
+    - "论文精读/*.qmd"
+    - "论文精读/*/*.qmd"
   resources:
     - "favicon.svg"
-    - "robotics/images/**"
-    - "deep-learning/images/**"
-    - "reinforcement-learning/images/**"
-    - "paper-reading/images/**"
+    - "机器人学/images/**"
+    - "深度学习/images/**"
+    - "强化学习/images/**"
+    - "论文精读/images/**"
+    - "论文精读/*/images/**"
 
 author: Jiacheng Zhang
 date-format: iso
@@ -62,56 +63,56 @@ website:
       - section: "Part 1: 机器人学"
         contents:
           - text: "机器人学笔记"
-            href: "robotics/index.qmd"
+            href: "机器人学/index.qmd"
           - section: "1.问题建模与优化"
             contents:
               - text: "优化问题求解"
-                href: "robotics/1.问题建模与优化/optimization.qmd"
+                href: "机器人学/1.问题建模与优化/optimization.qmd"
           - section: "2.Forward Kinematics"
             contents:
               - text: "平面机械臂正运动学"
-                href: "robotics/2.Forward Kinematics/fk-2d.qmd"
+                href: "机器人学/2.Forward Kinematics/fk-2d.qmd"
               - text: "三维机械臂正运动学"
-                href: "robotics/2.Forward Kinematics/fk-3d.qmd"
+                href: "机器人学/2.Forward Kinematics/fk-3d.qmd"
           - section: "3.Inverse Kinematics"
             contents:
               - text: "逆运动学"
-                href: "robotics/3.Inverse Kinematics/ik.qmd"
+                href: "机器人学/3.Inverse Kinematics/ik.qmd"
           - section: "4.Resolved Rate Control"
             contents:
               - text: "Resolved Rate Control"
-                href: "robotics/4.Resolved Rate Control/RRC.qmd"
+                href: "机器人学/4.Resolved Rate Control/RRC.qmd"
           - section: "5.Dynamics"
             contents:
               - text: "动力学"
-                href: "robotics/5.Dynamics/dynamics.qmd"
+                href: "机器人学/5.Dynamics/dynamics.qmd"
       - section: "Part 2: 深度学习"
         contents:
           - text: "深度学习"
-            href: "deep-learning/index.qmd"
+            href: "深度学习/index.qmd"
           - section: "1.大模型杂谈"
             contents:
               - text: "Sinusoidal 位置编码"
-                href: "deep-learning/1.大模型杂谈/positional-encoding-sinusoidal.qmd"
+                href: "深度学习/1.大模型杂谈/positional-encoding-sinusoidal.qmd"
               - text: "为什么需要位置编码"
-                href: "deep-learning/1.大模型杂谈/positional-encoding-why.qmd"
+                href: "深度学习/1.大模型杂谈/positional-encoding-why.qmd"
           - section: "2.优化算法"
             contents:
               - text: "几种常见的优化器"
-                href: "deep-learning/2.优化算法/optimizers.qmd"
+                href: "深度学习/2.优化算法/optimizers.qmd"
       - section: "Part 3: 强化学习"
         contents:
           - text: "强化学习"
-            href: "reinforcement-learning/index.qmd"
+            href: "强化学习/index.qmd"
           - section: "1.强化学习基础"
             contents:
               - text: "贝尔曼方程"
-                href: "reinforcement-learning/1.强化学习基础/Bellman Equation.qmd"
+                href: "强化学习/1.强化学习基础/Bellman Equation.qmd"
       - section: "Part 4: 论文精读"
         contents:
           - text: "论文精读"
-            href: "paper-reading/index.qmd"
+            href: "论文精读/index.qmd"
           - section: "1.具身智能"
             contents:
               - text: "ACT（Action Chunking Transformer）"
-                href: "paper-reading/1.具身智能/ACT.qmd"
+                href: "论文精读/1.具身智能/ACT.qmd"

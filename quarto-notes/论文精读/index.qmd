@@ -1,0 +1,13 @@
+---
+title: "论文精读"
+author: Jiacheng Zhang
+date: 2026-06-11
+description: 系统整理论文阅读笔记
+categories: ["论文精读"]
+---
+
+## 章节
+
+| Part | Chapter | Topic |
+|---|---|---|
+| 1 | [ACT（Action Chunking Transformer）](<1.具身智能/ACT.qmd>) | 具身智能、模仿学习、动作分块 |

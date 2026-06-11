@@ -20,10 +20,10 @@ import re
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "_quarto.yml"
 PARTS = [
-    ("Part 1: 机器人学", "robotics"),
-    ("Part 2: 深度学习", "deep-learning"),
-    ("Part 3: 强化学习", "reinforcement-learning"),
-    ("Part 4: 论文精读", "paper-reading"),
+    ("Part 1: 机器人学", "机器人学"),
+    ("Part 2: 深度学习", "深度学习"),
+    ("Part 3: 强化学习", "强化学习"),
+    ("Part 4: 论文精读", "论文精读"),
 ]
 
 

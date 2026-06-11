@@ -5,8 +5,10 @@ date: 2026-06-07
 page-layout: full
 listing:
   contents:
-    - robotics/index.qmd
-    - deep-learning/index.qmd
+    - 机器人学/index.qmd
+    - 深度学习/index.qmd
+    - 强化学习/index.qmd
+    - 论文精读/index.qmd
   type: table
   fields: [title, author, date]
   sort: title asc

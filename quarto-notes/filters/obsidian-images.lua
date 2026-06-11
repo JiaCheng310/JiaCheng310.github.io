@@ -32,34 +32,132 @@ local function input_file()
   return tostring(PANDOC_STATE.input_files[1]):gsub("\\", "/")
 end
 
-local function image_prefix_for_current_file()
+local function input_dir()
   local input = input_file()
-  local match = input:match("(robotics/.+)/[^/]+$")
-    or input:match("(deep%-learning/.+)/[^/]+$")
-    or input:match("(reinforcement%-learning/.+)/[^/]+$")
-    or input:match("(paper%-reading/.+)/[^/]+$")
-
-  if not match then
+  if input == "" then
     return ""
   end
 
-  local slash_count = 0
-  for _ in match:gmatch("/") do
-    slash_count = slash_count + 1
+  return input:match("^(.*)/[^/]+$") or ""
+end
+
+local function file_exists(path)
+  local candidates = { path, "quarto-notes/" .. path }
+
+  if PANDOC_STATE and PANDOC_STATE.resource_path then
+    for _, root in ipairs(PANDOC_STATE.resource_path) do
+      table.insert(candidates, root .. "/" .. path)
+      table.insert(candidates, root .. "/quarto-notes/" .. path)
+    end
   end
 
-  if slash_count <= 0 then
-    return ""
+  for _, candidate in ipairs(candidates) do
+    local file = io.open(candidate, "rb")
+    if file then
+      file:close()
+      return true
+    end
   end
 
-  return string.rep("../", slash_count)
+  return false
+end
+
+local function is_image_file(target)
+  return target:lower():match("%.gif$")
+    or target:lower():match("%.png$")
+    or target:lower():match("%.jpe?g$")
+    or target:lower():match("%.webp$")
+    or target:lower():match("%.svg$")
+end
+
+local make_image
+
+local function append_inline(parts, inline)
+  if inline.t == "Str" and #parts > 0 and parts[#parts].t == "Str" then
+    parts[#parts].text = parts[#parts].text .. inline.text
+  else
+    table.insert(parts, inline)
+  end
+end
+
+local function obsidian_images_in_mixed_paragraph(inlines)
+  local result = {}
+  local changed = false
+  local i = 1
+
+  while i <= #inlines do
+    local item = inlines[i]
+
+    if item.t == "Str" and item.text:match("^%!%[%[") then
+      local text = ""
+      local j = i
+
+      while j <= #inlines do
+        local current = inlines[j]
+        if current.t == "Str" then
+          text = text .. current.text
+        elseif current.t == "Space" then
+          text = text .. " "
+        else
+          break
+        end
+
+        if text:find("%]%]") then
+          break
+        end
+
+        j = j + 1
+      end
+
+      local target, size = parse_obsidian_image(text)
+      if target and is_image_file(target) then
+        table.insert(result, make_image(target, size))
+        changed = true
+        i = j + 1
+      else
+        append_inline(result, item)
+        i = i + 1
+      end
+    else
+      append_inline(result, item)
+      i = i + 1
+    end
+  end
+
+  if not changed then
+    return nil
+  end
+
+  return result
+end
+
+local function resolve_existing_image(target)
+  local base = input_dir()
+  if base == "" then
+    return nil
+  end
+
+  local candidates = {
+    target,
+    "images/" .. target,
+    "../images/" .. target,
+    "../../images/" .. target
+  }
+
+  for _, candidate in ipairs(candidates) do
+    if file_exists(base .. "/" .. candidate) then
+      return candidate
+    end
+  end
+
+  return nil
 end
 
 local function normalize_target(target)
   target = target:gsub("^%s+", ""):gsub("%s+$", "")
 
   if target:match("^images/") then
-    return "../" .. target
+    return target
   end
 
   if target:match("^https?://") or target:match("^/") or target:match("^%.%.?/") or target:find("/") then
@@ -67,13 +165,13 @@ local function normalize_target(target)
   end
 
   if target:lower():match("%.gif$") or target:lower():match("%.png$") or target:lower():match("%.jpe?g$") or target:lower():match("%.webp$") or target:lower():match("%.svg$") then
-    return "../images/" .. target
+    return resolve_existing_image(target) or "../images/" .. target
   end
 
   return target
 end
 
-local function make_image(target, size)
+make_image = function(target, size)
   local attrs = {
     ["fig-align"] = "center"
   }
@@ -264,6 +362,11 @@ function Para(el)
   local target, size = parse_obsidian_image(pandoc.utils.stringify(el))
   if target then
     return pandoc.Para({ make_image(target, size) })
+  end
+
+  local mixed = obsidian_images_in_mixed_paragraph(el.content)
+  if mixed then
+    return pandoc.Para(mixed)
   end
 
   local infos = image_infos_from_inlines(el.content)
