@@ -32,7 +32,7 @@ $$
  c(x_k+\Delta x_k) \approx c(x_k) + c^\prime(x_k)\Delta x_k
 $$
 
-![[images/pasted-image-20260604155608.png|300]]
+![[../images/pasted-image-20260604155608.png|300]]
 
 
 如图所示，此处的 $c^\prime(x_k)$ 为正数，沿着这个方向的 $c(x)$ 有增长的趋势。但我们的目标是让其最小化，因此 $x_k$ 走的方向应当和 $c^\prime(x)$ 的方向相反，那么 $\Delta x_k$ 的一个选择是：
@@ -60,7 +60,7 @@ $$
 c(x_k+\Delta x_k) \approx c(x_k) + c^\prime(x_k)\Delta x_k + \frac{1}{2}c^{\prime\prime}(x_k)\Delta x^2_k
 $$
 
-![[images/pasted-image-20260604163902.png|300]]
+![[../images/pasted-image-20260604163902.png|300]]
 
 
 观测右式，我们利用了二次函数在局部近似代价函数 $c(x)$ ，如果 $c^{\prime\prime}(x_k)>0$ ，则这个局部二次函数是下凸的，有极小值。 一个直观的想法是：局部二次函数的极小值可以作为原函数极小值的猜测。
@@ -80,7 +80,7 @@ $$
 
 然而，假如 $c^{\prime\prime}(x_k) \leq 0$  ，我们该怎么更新呢：
 
-![[images/pasted-image-20260604195838.png|250]]
+![[../images/pasted-image-20260604195838.png|250]]
 
 
 此时我们没法再直接用上述的牛顿法更新，以图中 $c^{\prime\prime}(x_k)<0$ 为例，局部二次函数的开口向下，还用上述的方法更新只会让代价函数更大，因此实际操作中，会将 $c^{\prime\prime}(x_k)$ 替换成一个很小的正数，从而保证我们的更新是可信的。
@@ -96,7 +96,7 @@ x_{k+1} = x_k - \frac{f(x_k)}{f^\prime(x_k)}
 $$
 将其作为下一步的猜测，继续更新。
 
-![[images/pasted-image-20260604165427.png|300]]
+![[../images/pasted-image-20260604165427.png|300]]
 
 
 那么我们最小化代价函数 $c(x)$ 的问题可以转化为求解 $c^\prime(x) =0$ 的零点问题，因此更新使用：
@@ -119,7 +119,7 @@ $$
 x_{k+1} = x_{k} -H^{-1}(x_k)g(x_k)
 $$
 
-![[images/pasted-image-20260604195401.png|500]]
+![[../images/pasted-image-20260604195401.png|500]]
 
 
 实际操作中需要在每一步更新检查 Hessian 矩阵是否正定，由于矩阵正定性不那么容易满足，往往会通过正则化来保证：取一个较大的正数 $\lambda$ ，令 $H_{new} = H +\lambda I$ 正定，再利用上述公式更新：

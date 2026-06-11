@@ -83,8 +83,8 @@ $$
 $$
 
 下面的例子可以看到机械臂在初期的运动速度较快，后期则逐步变慢：
-![[images/ik_RRCDLS2.gif|500]]
-![[RRC3d.gif|500]]
+![[../images/ik_RRCDLS2.gif|500]]
+![[../images/RRC3d.gif|500]]
 
 ## RRC与IK的关系
 

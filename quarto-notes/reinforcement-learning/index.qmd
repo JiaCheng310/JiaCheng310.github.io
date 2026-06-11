@@ -6,3 +6,9 @@ description: 系统整理强化学习相关笔记
 categories: ["强化学习"]
 ---
 本篇笔记的基础部分源于西湖大学赵世钰老师的《强化学习的数学原理》
+
+## 章节
+
+| Part | Chapter | Topic |
+|---|---|---|
+| 1 | [贝尔曼方程](<1.强化学习基础/Bellman Equation.qmd>) | MDP、回报、状态价值函数 |

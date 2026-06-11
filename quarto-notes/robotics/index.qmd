@@ -9,9 +9,9 @@ description: 机器人学笔记，大部分内容基于Craig的经典著作
 
 | Part | Chapter | Topic |
 |---|---|---|
-| Part 1 | [优化问题求解](optimization.qmd) | 任务建模、代价函数 |
-| Part 2 | [平面机械臂正运动学](fk-2d.qmd) | Forward Kinematics |
-| Part 2 | [三维机械臂正运动学](fk-3d.qmd) | MDH、齐次变换 |
-| Part 3 | [逆运动学](ik.qmd) | IK、多解性、Pieper 准则 |
-| Part 4 | [Resolved Rate Control](RRC.qmd) | 速度层 IK、雅可比控制 |
-| Part 5 | [动力学](dynamics.qmd) | 质量矩阵、科氏力、重力项 |
+| 1 | [优化问题求解](<1.问题建模与优化/optimization.qmd>) | 任务建模、代价函数 |
+| 2 | [平面机械臂正运动学](<2.Forward Kinematics/fk-2d.qmd>) | Forward Kinematics |
+| 2 | [三维机械臂正运动学](<2.Forward Kinematics/fk-3d.qmd>) | MDH、齐次变换 |
+| 3 | [逆运动学](<3.Inverse Kinematics/ik.qmd>) | IK、多解性、Pieper 准则 |
+| 4 | [Resolved Rate Control](<4.Resolved Rate Control/RRC.qmd>) | 速度层 IK、雅可比控制 |
+| 5 | [动力学](<5.Dynamics/dynamics.qmd>) | 质量矩阵、科氏力、重力项 |

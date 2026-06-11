@@ -24,15 +24,50 @@ local function normalize_size(size)
   return size
 end
 
+local function input_file()
+  if not PANDOC_STATE or not PANDOC_STATE.input_files or #PANDOC_STATE.input_files == 0 then
+    return ""
+  end
+
+  return tostring(PANDOC_STATE.input_files[1]):gsub("\\", "/")
+end
+
+local function image_prefix_for_current_file()
+  local input = input_file()
+  local match = input:match("(robotics/.+)/[^/]+$")
+    or input:match("(deep%-learning/.+)/[^/]+$")
+    or input:match("(reinforcement%-learning/.+)/[^/]+$")
+    or input:match("(paper%-reading/.+)/[^/]+$")
+
+  if not match then
+    return ""
+  end
+
+  local slash_count = 0
+  for _ in match:gmatch("/") do
+    slash_count = slash_count + 1
+  end
+
+  if slash_count <= 0 then
+    return ""
+  end
+
+  return string.rep("../", slash_count)
+end
+
 local function normalize_target(target)
   target = target:gsub("^%s+", ""):gsub("%s+$", "")
+
+  if target:match("^images/") then
+    return "../" .. target
+  end
 
   if target:match("^https?://") or target:match("^/") or target:match("^%.%.?/") or target:find("/") then
     return target
   end
 
   if target:lower():match("%.gif$") or target:lower():match("%.png$") or target:lower():match("%.jpe?g$") or target:lower():match("%.webp$") or target:lower():match("%.svg$") then
-    return "images/" .. target
+    return "../images/" .. target
   end
 
   return target

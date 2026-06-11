@@ -4,9 +4,13 @@ project:
   render:
     - "*.qmd"
     - "robotics/*.qmd"
+    - "robotics/*/*.qmd"
     - "deep-learning/*.qmd"
+    - "deep-learning/*/*.qmd"
     - "reinforcement-learning/*.qmd"
+    - "reinforcement-learning/*/*.qmd"
     - "paper-reading/*.qmd"
+    - "paper-reading/*/*.qmd"
   resources:
     - "favicon.svg"
     - "robotics/images/**"
@@ -53,39 +57,61 @@ website:
   sidebar:
     style: floating
     contents:
-      - text: "首页"
-        href: index.qmd
+      - text: "Jiacheng's Notes"
+        href: "index.qmd"
       - section: "Part 1: 机器人学"
         contents:
-          - section: "Chapter 1: 问题建模与优化"
+          - text: "机器人学笔记"
+            href: "robotics/index.qmd"
+          - section: "1.问题建模与优化"
             contents:
-              - robotics/optimization.qmd
-          - section: "Chapter 2: Forward Kinematics"
+              - text: "优化问题求解"
+                href: "robotics/1.问题建模与优化/optimization.qmd"
+          - section: "2.Forward Kinematics"
             contents:
-              - robotics/fk-2d.qmd
-              - robotics/fk-3d.qmd
-          - section: "Chapter 3: Inverse Kinematics"
+              - text: "平面机械臂正运动学"
+                href: "robotics/2.Forward Kinematics/fk-2d.qmd"
+              - text: "三维机械臂正运动学"
+                href: "robotics/2.Forward Kinematics/fk-3d.qmd"
+          - section: "3.Inverse Kinematics"
             contents:
-              - robotics/ik.qmd
-          - section: "Chapter 4: Resolved Rate Control"
+              - text: "逆运动学"
+                href: "robotics/3.Inverse Kinematics/ik.qmd"
+          - section: "4.Resolved Rate Control"
             contents:
-              - robotics/RRC.qmd
-          - section: "Chapter 5: Dynamics"
+              - text: "Resolved Rate Control"
+                href: "robotics/4.Resolved Rate Control/RRC.qmd"
+          - section: "5.Dynamics"
             contents:
-              - robotics/dynamics.qmd
+              - text: "动力学"
+                href: "robotics/5.Dynamics/dynamics.qmd"
       - section: "Part 2: 深度学习"
         contents:
-          - section: "Chapter 1: 大模型杂谈"
+          - text: "深度学习"
+            href: "deep-learning/index.qmd"
+          - section: "1.大模型杂谈"
             contents:
-              - deep-learning/positional-encoding-why.qmd
-              - deep-learning/positional-encoding-sinusoidal.qmd
-          - section: "Chapter 2: 优化算法"
+              - text: "Sinusoidal 位置编码"
+                href: "deep-learning/1.大模型杂谈/positional-encoding-sinusoidal.qmd"
+              - text: "为什么需要位置编码"
+                href: "deep-learning/1.大模型杂谈/positional-encoding-why.qmd"
+          - section: "2.优化算法"
             contents:
-              - deep-learning/optimizers.qmd
+              - text: "几种常见的优化器"
+                href: "deep-learning/2.优化算法/optimizers.qmd"
       - section: "Part 3: 强化学习"
         contents:
-          - reinforcement-learning/index.qmd
+          - text: "强化学习"
+            href: "reinforcement-learning/index.qmd"
+          - section: "1.强化学习基础"
+            contents:
+              - text: "贝尔曼方程"
+                href: "reinforcement-learning/1.强化学习基础/Bellman Equation.qmd"
       - section: "Part 4: 论文精读"
         contents:
-          - paper-reading/index.qmd
-          - paper-reading/template.qmd
+          - text: "论文精读"
+            href: "paper-reading/index.qmd"
+          - section: "1.文章与模板"
+            contents:
+              - text: "论文精读模板"
+                href: "paper-reading/1.文章与模板/template.qmd"

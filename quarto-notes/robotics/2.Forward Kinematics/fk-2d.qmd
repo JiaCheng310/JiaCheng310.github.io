@@ -12,12 +12,12 @@ categories:
 
 **Forward Kinematics(FK)** 是一种已知机器人每个关节状态，求解其末端位置和姿态的方法。本文以最简单的2D RR机械臂为例：
 
-![[images/pasted-image-20260605133548.png|300]]
+![[../images/pasted-image-20260605133548.png|300]]
 
 
 此例子中，我们已知两根杆的长度和关节角，想要求出末端的状态，注意我们不能仅仅用坐标系中的一个点来描述末端状态，同一个点可能有多个机械臂的状态对应，更一般的情况是三维机械臂，保持末端中心点不变情况下，可以有不同的朝向：
 
-![[images/pasted-image-20260605134141.png|300]]
+![[../images/pasted-image-20260605134141.png|300]]
 
 
 因此我们需要引入**姿态（Orientation）** 来描述机械臂的朝向，2D的情况我们可以先简单理解为位置+朝向角。
@@ -34,7 +34,7 @@ x_e(q) = f^{\text{ee}}(q) =\begin{bmatrix}p_x(q)\\p_y(q)\\\phi(q) \end{bmatrix}
 $$
 其中，$p_x$ 和 $p_y$ 是末端执行器的二维坐标，$\phi$ 是朝向角。在二维情况，这种描述可以唯一固定机械臂的末端状态。
 
-![[images/pasted-image-20260605133548.png|300]]
+![[../images/pasted-image-20260605133548.png|300]]
 
 
 显然我们有:
@@ -74,7 +74,7 @@ $$
 
 可以使用 Matlab 绘图来体会正运动学的求解：
 
-![[images/fk_3link.gif|400]]
+![[../images/fk_3link.gif|400]]
 
 
 ```matlab
