@@ -1,5 +1,5 @@
 ---
-title: "大模型杂谈"
+title: "深度学习"
 author: Jiacheng Zhang
 date: 2026-06-07
 description: "Transformer、位置编码和优化器相关笔记的系统整理。"

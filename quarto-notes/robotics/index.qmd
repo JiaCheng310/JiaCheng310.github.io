@@ -13,3 +13,5 @@ description: 机器人学笔记，大部分内容基于Craig的经典著作
 | Part 2 | [平面机械臂正运动学](fk-2d.qmd) | Forward Kinematics |
 | Part 2 | [三维机械臂正运动学](fk-3d.qmd) | MDH、齐次变换 |
 | Part 3 | [逆运动学](ik.qmd) | IK、多解性、Pieper 准则 |
+| Part 4 | [Resolved Rate Control](RRC.qmd) | 速度层 IK、雅可比控制 |
+| Part 5 | [动力学](dynamics.qmd) | 质量矩阵、科氏力、重力项 |

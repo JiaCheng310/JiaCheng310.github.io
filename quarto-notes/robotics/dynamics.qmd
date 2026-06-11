@@ -1,0 +1,7 @@
+---
+title: "动力学"
+author: Jiacheng Zhang
+date: 2026-06-11
+description: 机械臂动力学笔记
+categories: ["机器人学", "动力学"]
+---

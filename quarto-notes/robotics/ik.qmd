@@ -1,11 +1,11 @@
 ---
-title: "逆运动学"
-author: "Jiacheng Zhang"
+title: 逆运动学
+author: Jiacheng Zhang
 date: 2026-06-06
-description: "简要介绍逆运动学及其解法"
+description: 简要介绍逆运动学及其解法
 categories:
-  - "机器人学"
-  - "优化问题"
+  - 机器人学
+  - 优化问题
 ---
 
 下面我们会介绍**逆运动学（Inverse Kinematics）** 及其解法。在之前提及的正运动学中，问题可以被定义为：已知机械臂的关节变量 $q$，求末端任务空间位姿 $x_e$：

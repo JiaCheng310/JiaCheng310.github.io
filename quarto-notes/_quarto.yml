@@ -6,11 +6,13 @@ project:
     - "robotics/*.qmd"
     - "deep-learning/*.qmd"
     - "reinforcement-learning/*.qmd"
+    - "paper-reading/*.qmd"
   resources:
     - "favicon.svg"
     - "robotics/images/**"
     - "deep-learning/images/**"
     - "reinforcement-learning/images/**"
+    - "paper-reading/images/**"
 
 author: Jiacheng Zhang
 date-format: iso
@@ -68,9 +70,12 @@ website:
           - section: "Chapter 4: Resolved Rate Control"
             contents:
               - robotics/RRC.qmd
-      - section: "Part 2: 大模型杂谈"
+          - section: "Chapter 5: Dynamics"
+            contents:
+              - robotics/dynamics.qmd
+      - section: "Part 2: 深度学习"
         contents:
-          - section: "Chapter 1: Transformer 基础"
+          - section: "Chapter 1: 大模型杂谈"
             contents:
               - deep-learning/positional-encoding-why.qmd
               - deep-learning/positional-encoding-sinusoidal.qmd
@@ -80,3 +85,7 @@ website:
       - section: "Part 3: 强化学习"
         contents:
           - reinforcement-learning/index.qmd
+      - section: "Part 4: 论文精读"
+        contents:
+          - paper-reading/index.qmd
+          - paper-reading/template.qmd
