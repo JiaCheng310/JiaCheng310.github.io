@@ -51,13 +51,217 @@ G_t &= R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \cdots\\~\\
 & = R_{t+1} + \gamma G_{t+1}
 \end{aligned}
 $$
- 则 state value 可以进一步改写成：
-
- $$
+ 则 state value 可以进一步改写成：$$
 \begin{aligned}
 v_{\pi}(s) &= \mathbb{E} [G_t| S_t = s]\\~\\
-& = \mathbb{E}[R_{t+1} + G_{t+1} | S_t = s]\\~\\
-& = 
+& = \mathbb{E}[R_{t+1} + \gamma G_{t+1} | S_t = s]\\~\\
+& = \mathbb{E}[R_{t+1} | S_t = s] + \gamma\mathbb{E}[G_{t+1}|S_t =s]
 \end{aligned}
+$$
+直观可以理解为：前一项表示状态转移的即时奖励，后一项表示未来的总回报。下面我们对上述两项分别计算：
+$$
+\begin{aligned}
+\mathbb{E}[R_{t+1}|S_t = s] &= \sum_{a\in \mathcal{A}} \pi(a|s)\mathbb{E}[R_{t+1}|S_t = s,A_t = a]\\
+& = \sum_{a\in \mathcal{A}} \pi(a|s)\sum_{r\in\mathcal{R}}p(r|s,a)r
+\end{aligned}
+$$
+$$
+\begin{aligned}
+\mathbb{E} [G_{t+1}|S_t=s] & = \sum_{s^\prime\in\mathcal{S}}p(s^\prime | s)\mathbb{E} [G_{t+1}|S_t=s,S_{t+1} = s^\prime]\\~\\
+&= \sum_{s^\prime\in\mathcal{S}}p(s^\prime | s)\mathbb{E} [G_{t+1}|S_{t+1} = s^\prime]\quad \text{(马尔可夫性)}\\~\\
+&= \sum_{s^\prime\in\mathcal{S}}v_{\pi}(s^\prime)p(s^\prime | s)\\~\\
+& =\sum_{s^\prime\in\mathcal{S}}v_{\pi}(s^\prime)\sum_{a\in\mathcal{A}}p(s^\prime|s,a)\pi(a|s)
+\end{aligned}
+$$
+
+我们可以把上式重新写为：
 
 $$
+\begin{aligned}
+v_{\pi}(s) & = \mathbb{E}[R_{t+1} | S_t = s] + \gamma\mathbb{E}[G_{t+1}|S_t =s]\\~\\
+& = \sum_{a\in \mathcal{A}} \pi(a|s)\sum_{r\in\mathcal{R}}p(r|s,a)r+\gamma\sum_{s^\prime\in\mathcal{S}}v_{\pi}(s^\prime)\sum_{a\in\mathcal{A}}p(s^\prime|s,a)\pi(a|s)\\~\\
+& = \sum_{a\in \mathcal{A}} \pi(a|s)\sum_{r\in\mathcal{R}}p(r|s,a)r+\gamma
+\sum_{a\in\mathcal{A}}\pi(a|s)\sum_{s^\prime\in\mathcal{S}}p(s^\prime|s,a)v_{\pi}(s^\prime)\\~\\
+&  = \sum_{a\in \mathcal{A}}\pi(a|s) [\sum_{r\in\mathcal{R}}p(r|s,a)r+ \gamma\sum_{s^\prime\in\mathcal{S}}p(s^\prime|s,a)v_{\pi}(s^\prime)]\\
+\end{aligned}
+$$
+
+这就是 **贝尔曼方程（Bellman Equation）**，对于每个状态 $s$ ，在策略 $\pi$ 下都有一个这样的方程。
+我们通过求解 Bellman Equation 得到 state value，从而对策略进行评价。
+
+一个具体的例子：
+
+![[Pasted image 20260612154223.png|300]]
+
+此时的策略是确定性策略，状态 $s_1$ 一定会采取向下的动作到达状态 $s_3$ ，其 Bellman Equation为：
+$$
+v_\pi(s_1) = 0 + \gamma v_\pi(s_3)
+$$
+类似地可以写出：
+$$
+\begin{aligned}
+v_\pi(s_2) &= 1+ \gamma v_\pi(s_4)\\~\\
+v_\pi(s_3) &= 1+ \gamma v_\pi(s_4)\\~\\
+v_\pi(s_4) &= 1+ \gamma v_\pi(s_4)\\
+\end{aligned}
+$$
+可以解得：
+$$
+\begin{cases}
+v_\pi(s_1) = \frac{\gamma}{1-\gamma}\\
+v_\pi(s_2) = \frac{1}{1-\gamma}\\
+v_\pi(s_3) = \frac{1}{1-\gamma}\\
+v_\pi(s_4) = \frac{1}{1-\gamma}\\
+\end{cases}
+$$
+对于不确定性的策略也同理计算：
+
+![[Pasted image 20260612154903.png|300]]
+
+可以写出：
+$$
+\begin{aligned}
+v_\pi(s_1) &= -0.5 + 0.5\gamma(v_\pi(s_2) + v_\pi(s_3))\\~\\
+v_\pi(s_2) &= 1+ \gamma v_\pi(s_4)\\~\\
+v_\pi(s_3) &= 1+ \gamma v_\pi(s_4)\\~\\
+v_\pi(s_4) &= 1+ \gamma v_\pi(s_4)\\
+\end{aligned}
+$$
+
+解得：
+$$
+\begin{cases}
+v_\pi(s_1) = \frac{\gamma}{1-\gamma} - 0.5\\
+v_\pi(s_2) = \frac{1}{1-\gamma}\\
+v_\pi(s_3) = \frac{1}{1-\gamma}\\
+v_\pi(s_4) = \frac{1}{1-\gamma}\\
+\end{cases}
+$$
+
+因此这种策略的 state value 全都不大于上一种策略的 state value，因此认为上一种策略是更好的
+
+
+## Matrix-Vector Form
+
+为方便求解，改写 Bellman Equation 为 Matrix-Vector Form，首先将之前的形式转换为：
+
+$$
+v_\pi(s) = r_\pi(s) + \gamma\sum_{s^\prime \in \mathcal{S}}p_\pi(s^\prime | s)v_\pi(s^\prime)
+$$
+其中：
+- $r_\pi(s) = \sum_{a\in\mathcal{A}}\pi(a|s)\sum_{r\in \mathcal{R}}p(r|s,a)r$ 
+- $p_\pi(s^\prime |s) = \sum_{a\in \mathcal{A}}\pi(a|s)p(s^\prime|s,a)$ 
+
+前一项是即时奖励的期望，后一项则是转移到下一个状态获得后续回报的期望（带折扣因子），这种形式比上述推导的形式更加直观易懂。
+
+因此可以写出每个状态的方程：
+$$
+
+v_\pi(s_i) = r_\pi(s_i) + \gamma\sum_{s_j \in \mathcal{S}}p_\pi(s_j|s_i)v_\pi(s_j)
+$$
+这引出了矩阵形式：
+$$
+v_\pi = r_\pi  + \gamma P_\pi v_\pi
+$$
+其中：
+$$
+v_\pi = \begin{bmatrix}
+v_\pi(s_1)\\
+v_\pi(s_2)\\
+\vdots\\
+v_\pi(s_n)
+\end{bmatrix}
+,\quad
+r_\pi = \begin{bmatrix}
+r_\pi(s_1)\\
+r_\pi(s_2)\\
+\vdots\\
+r_\pi(s_n)
+\end{bmatrix}
+,\quad
+P_\pi = \begin{bmatrix}
+p(s_1|s_1) & p(s_2|s_1) &\cdots & p(s_n|s_1)\\
+p(s_1|s_2) & p(s_2|s_2) &\cdots & p(s_n|s_2)\\
+\vdots& & & \vdots\\
+p(s_1|s_n) & p(s_2|s_n) &\cdots & p(s_n|s_n)\\
+\end{bmatrix}
+$$
+不难看出：
+$$[P_\pi]_{ij} = p(s_j | s_i)$$
+对于之前的例子，写出矩阵形式方程：
+
+![[Pasted image 20260612154903.png|300]]
+
+$$
+\begin{bmatrix}
+v_\pi(s_1)\\
+v_\pi(s_2)\\
+v_\pi(s_3)\\
+v_\pi(s_4)
+\end{bmatrix}
+ = \begin{bmatrix}
+-0.5\\
+1\\
+1\\
+1
+\end{bmatrix}+\gamma
+\begin{bmatrix}
+0 & 0.5 & 0.5 & 0\\
+ 0& 0& 0 & 1\\
+ 0& 0& 0 & 1\\
+ 0& 0& 0 & 1\\
+\end{bmatrix}
+\begin{bmatrix}
+v_\pi(s_1)\\
+v_\pi(s_2)\\
+v_\pi(s_3)\\
+v_\pi(s_4)
+\end{bmatrix}
+$$
+
+
+## 求解方法
+
+### Closed Form
+
+直接根据：
+$$
+v_\pi = r_\pi  + \gamma P_\pi v_\pi
+$$
+移项求逆得到解析解：
+$$
+v_\pi = (I-\gamma P_\pi)^{-1} r_\pi 
+$$
+
+问题在于，矩阵 $I-\gamma P_\pi$ 是否一定可逆，只要折扣因子 $\gamma<1$ ，答案是肯定的。
+
+
+::: {.proof name="可逆性"}
+往证 $I-\gamma P_\pi$ 可逆，只需要证明它的零空间只有零向量
+对于任意向量 $x$ ，考虑无穷范数：
+$$
+\|x\|_{\infty} = \max_{s}|x(s)|
+$$
+由于 $P_\pi$ 作为状态转移矩阵，$P_\pi x$  可以看作对 $x$ 的每一项加权平均，有：
+$$
+\|P_\pi x\|_{\infty} \leq \|x\|_{\infty}
+$$
+考虑折扣因子，进一步有：
+$$
+\|\gamma P_\pi x\|_{\infty} \leq \gamma \|x\|_{\infty}
+$$
+下面考虑零空间：
+$$
+(I-\gamma P_\pi)x = 0
+$$
+则有：
+$$
+x = \gamma P_\pi x
+$$
+两边取无穷范数：
+$$
+\|x\|_{\infty} = \|\gamma P_\pi x\|_{\infty} \leq \gamma\|x\|_{\infty}
+$$
+
+因此 $x = 0$ ，从而零空间只有零向量，矩阵可逆
+:::
