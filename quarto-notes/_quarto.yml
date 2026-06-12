@@ -16,6 +16,7 @@ project:
     - "机器人学/images/**"
     - "深度学习/images/**"
     - "强化学习/images/**"
+    - "强化学习/*/images/**"
     - "论文精读/images/**"
     - "论文精读/*/images/**"
 

@@ -41,13 +41,48 @@ local function input_dir()
   return input:match("^(.*)/[^/]+$") or ""
 end
 
+local function add_unique(values, value)
+  if not value or value == "" then
+    return
+  end
+
+  for _, existing in ipairs(values) do
+    if existing == value then
+      return
+    end
+  end
+
+  table.insert(values, value)
+end
+
+local function join_path(base, path)
+  if not base or base == "" then
+    return path
+  end
+
+  return base .. "/" .. path
+end
+
 local function file_exists(path)
-  local candidates = { path, "quarto-notes/" .. path }
+  local candidates = {}
+  add_unique(candidates, path)
+
+  local project_relative = path:match("^quarto%-notes/(.+)$")
+  if project_relative then
+    add_unique(candidates, project_relative)
+  elseif not path:match("^/") then
+    add_unique(candidates, "quarto-notes/" .. path)
+  end
 
   if PANDOC_STATE and PANDOC_STATE.resource_path then
     for _, root in ipairs(PANDOC_STATE.resource_path) do
-      table.insert(candidates, root .. "/" .. path)
-      table.insert(candidates, root .. "/quarto-notes/" .. path)
+      add_unique(candidates, root .. "/" .. path)
+
+      if project_relative then
+        add_unique(candidates, root .. "/" .. project_relative)
+      elseif not path:match("^/") then
+        add_unique(candidates, root .. "/quarto-notes/" .. path)
+      end
     end
   end
 
@@ -133,20 +168,19 @@ end
 
 local function resolve_existing_image(target)
   local base = input_dir()
-  if base == "" then
-    return nil
-  end
-
   local candidates = {
     target,
     "images/" .. target,
     "../images/" .. target,
     "../../images/" .. target
   }
+  local bases = { base, "" }
 
   for _, candidate in ipairs(candidates) do
-    if file_exists(base .. "/" .. candidate) then
-      return candidate
+    for _, candidate_base in ipairs(bases) do
+      if file_exists(join_path(candidate_base, candidate)) then
+        return candidate
+      end
     end
   end
 

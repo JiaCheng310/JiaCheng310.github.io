@@ -31,7 +31,7 @@ $$
 $$
 G_t = R_{t+1} + \gamma R_{t+2} +\gamma^2R_{t+3} +\cdots
 $$
-定义 state value fuction为：
+定义 state value function 为：
 
 $$
 v_{\pi}(s) = \mathbb{E}[G_t | S_t = s]
@@ -222,7 +222,7 @@ $$
 
 ## 求解方法
 
-### Closed Form
+### Closed Form Solution
 
 直接根据：
 $$
@@ -237,6 +237,7 @@ $$
 
 
 ::: {.proof name="可逆性"}
+
 往证 $I-\gamma P_\pi$ 可逆，只需要证明它的零空间只有零向量
 对于任意向量 $x$ ，考虑无穷范数：
 $$
@@ -264,4 +265,58 @@ $$
 $$
 
 因此 $x = 0$ ，从而零空间只有零向量，矩阵可逆
+:::
+
+然而实际工程中，状态空间的维数可能巨大，这给矩阵求逆带来了很大的麻烦，因此通常采用下述的迭代法：
+
+
+### Iterative Solution
+
+
+迭代法从一个随机的初始猜测 $v_0 \in \mathbb{R}^n$ 出发，不断利用下述式子更新：
+$$
+v_{k+1} = r_\pi + \gamma P_\pi v_{k},\quad k = 0,1,2\cdots
+$$
+最终 $v_k \rightarrow v_\pi , k\rightarrow \infty$ ，证明如下：
+
+::: {.proof name="迭代法收敛性"}
+
+定义误差：
+$$
+\delta_k = v_k - v_\pi
+$$
+则有：
+$$
+v_k = \delta_k + v_\pi,\quad v_{k+1} = \delta_{k+1} + v_\pi
+$$
+带入之前的迭代式：
+$$
+\delta_{k+1} + v_\pi = r_\pi + \gamma P_\pi (\delta_k+v_\pi) =\gamma P_\pi \delta_k + r_\pi + \gamma P_\pi v_\pi
+$$
+由 Bellman Equation 可知 $r_\pi + \gamma P_\pi v_\pi = v_\pi$ ，因此：
+$$
+\delta_{k+1} = \gamma P_\pi \delta_k
+$$
+递推可得：
+$$
+\delta_k = (\gamma P_\pi)^k\delta_0
+$$
+由于 $P_\pi$ 是状态转移矩阵，对任意向量 $x$ 都有：
+$$
+\|P_\pi x\|_\infty \leq \|x\|_\infty
+$$
+于是：
+$$
+\|\delta_{k+1}\|_\infty
+= \|\gamma P_\pi\delta_k\|_\infty
+\leq \gamma\|\delta_k\|_\infty
+$$
+进一步得到：
+$$
+\|\delta_k\|_\infty \leq \gamma^k\|\delta_0\|_\infty
+$$
+当 $0 \leq \gamma < 1$ 时，$\gamma^k \rightarrow 0$ ，所以 $\|\delta_k\|_\infty \rightarrow 0$ ，即：
+$$
+v_k \rightarrow v_\pi
+$$
 :::

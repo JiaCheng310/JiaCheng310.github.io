@@ -3,6 +3,8 @@
 <div class="math-display">\[$2\]</div>
 
 $3` $content -}}
+{{- $content = replaceRE `!\[\[(\./)?images/([^|\]]+\.(png|jpg|jpeg|gif|webp|svg))\s*\|\s*([^\]]+)\]\]` `![$4](<./images/$2>)` $content -}}
+{{- $content = replaceRE `!\[\[(\./)?images/([^|\]]+\.(png|jpg|jpeg|gif|webp|svg))\]\]` `![](<./images/$2>)` $content -}}
 {{- $content = replaceRE `!\[\[[^|\]]*/images/([^|\]]+\.(png|jpg|jpeg|gif|webp|svg))\s*\|\s*([^\]]+)\]\]` `![$3](<./images/$1>)` $content -}}
 {{- $content = replaceRE `!\[\[[^|\]]*/images/([^|\]]+\.(png|jpg|jpeg|gif|webp|svg))\]\]` `![](<./images/$1>)` $content -}}
 {{- $content = replaceRE `!\[\[([^\]|]+\.(png|jpg|jpeg|gif|webp|svg))\s*\|\s*([^\]]+)\]\]` `![$3](<./images/$1>)` $content -}}

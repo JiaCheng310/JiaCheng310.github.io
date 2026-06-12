@@ -358,7 +358,7 @@ $$
 
 在mujoco仿真中，利用存储的**MjData**即可快速得到坐标：
 
-![[piper_demo.gif]]
+![[_legacy-hugo-notes/机器人学笔记（三）：三维机械臂正运动学（Foward Kinematics）/images/piper_demo.gif]]
 
 此处在原xml文件的基础上增加了site（图中的小蓝点）作为模型的一部分：
 

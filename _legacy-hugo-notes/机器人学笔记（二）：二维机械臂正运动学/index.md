@@ -71,7 +71,7 @@ $$
 
 可以使用 Matlab 绘图来体会正运动学的求解：
 
-![[fk_3link.gif|400]]
+![[_legacy-hugo-notes/机器人学笔记（二）：二维机械臂正运动学/images/fk_3link.gif|400]]
 
 ```matlab
 
