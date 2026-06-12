@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "quarto-notes/强化学习/1.强化学习基础/Bellman Equation.qmd",
+                "file": "quarto-notes/论文精读/1.具身智能/ACT.qmd",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Bellman Equation"
+              "title": "ACT"
             }
           }
         ]
@@ -192,22 +192,22 @@
     "quarto-notes/_site/robots.txt",
     "quarto-notes/_site/sitemap.xml",
     "quarto-notes/_site/styles.css",
+    "quarto-notes/_site/论文精读/1.具身智能/videos/deploy_rollout.mp4",
+    "quarto-notes/_site/论文精读/1.具身智能/videos",
     "quarto-notes/_site/论文精读/1.具身智能/images/Pasted image 20260611220523.png",
     "quarto-notes/_site/论文精读/1.具身智能/images/Pasted image 20260611215519.png",
-    "quarto-notes/_site/论文精读/1.具身智能/images/Pasted image 20260611205622.png",
     "quarto-notes/_site/论文精读/1.具身智能/images/Pasted image 20260611211933.png",
+    "quarto-notes/_site/论文精读/1.具身智能/images/Pasted image 20260611205622.png",
     "quarto-notes/_site/论文精读/1.具身智能/images/Pasted image 20260611200525.png",
-    "quarto-notes/_site/论文精读/1.具身智能/images/Pasted image 20260611195730.png",
     "quarto-notes/_site/论文精读/1.具身智能/images/Pasted image 20260611200210.png",
     "quarto-notes/_site/论文精读/1.具身智能/images/Pasted image 20260611195745.png",
+    "quarto-notes/_site/论文精读/1.具身智能/images/Pasted image 20260611195730.png",
     "quarto-notes/_site/论文精读/1.具身智能/images/Pasted image 20260611195656.png",
     "quarto-notes/_site/论文精读/1.具身智能/images",
     "quarto-notes/_site/强化学习/1.强化学习基础/images/Pasted image 20260612154903.png",
     "quarto-notes/_site/强化学习/1.强化学习基础/images",
     "quarto-notes/_site/强化学习/images",
     "quarto-notes/_site/深度学习/images",
-    "quarto-notes/_site/机器人学/images",
-    "quarto-notes/_site/site_libs/quarto-html/tabsets/tabsets.js",
     "quarto-notes/robotics/未命名.md",
     "index.md",
     "index 1.md",

@@ -19,6 +19,7 @@ project:
     - "强化学习/*/images/**"
     - "论文精读/images/**"
     - "论文精读/*/images/**"
+    - "论文精读/*/videos/**"
 
 author: Jiacheng Zhang
 date-format: iso
