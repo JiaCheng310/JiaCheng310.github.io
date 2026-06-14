@@ -2,7 +2,7 @@
 title: Vision Banana 视觉大一统
 author: Jiacheng Zhang
 date: 2026-06-12
-description: '""'
+description: 论文精读 Image Generators are Generalist Vision Learners，梳理 Vision Banana 如何把图像生成模型改造成统一视觉理解模型。
 categories:
   - 论文精读
   - CV
@@ -14,7 +14,7 @@ draft: false
 | Item  | Content                                         |
 | ----- | ----------------------------------------------- |
 | Title | Image Generators are Generalist Vision Learners |
-| Paper | https://arxiv.org/abs/2604.20329                |
+| Paper | [arXiv:2604.20329](https://arxiv.org/abs/2604.20329) |
 | Code  | None                                            |
 
 
@@ -25,22 +25,26 @@ draft: false
 具体的任务主要有：
 
 **原生任务：**
+
 1. Text-to-Image
 2. Image Editing
+
 论文要求模型在理解其他视觉任务的基础上**保持原有的文生图和图片编辑能力**。
 
 **2D视觉**：
+
  1. Semantic Segmentation（语义分割）
  2. Instance Segmentation（实例分割）
  3. Referring Expression Segmentation（指代分割）
 
 **3D视觉**：
+
 1. Depth Estimation（深度估计）
 2. Surface Normal Estimation（表面法向量估计）
 
 
 
-![[Pasted image 20260614144618.png]]
+![[images/Pasted image 20260614144618.png]]
 
 更形式化地，给定一个预训练图像生成器$G_{\theta_0}$，它原本学习的是条件图像生成分布：
 $$
@@ -81,7 +85,7 @@ $$
 第二个问题是**视觉理解任务输出空间不统一**，对于不同任务，传统做法是每类任务安排一个输出头，针对任务设计架构、目标，但这没有统一视觉理解，往往是Task- Specific的，还会削弱模型原生的生成能力
 
 
-![[Pasted image 20260614154704.png]]
+![[images/Pasted image 20260614154704.png]]
 
 ## Method
 
@@ -89,7 +93,7 @@ $$
 
 Vision Banana 把语义分割当作一个特殊的图像生成任务：  输入一张图像和一段文本提示（描述什么类别用什么颜色），生成一张彩色图，图中每个像素的颜色直接表示该像素所属的类别
 
-![[Pasted image 20260614155125.png]]
+![[images/Pasted image 20260614155125.png]]
 
 输入图像和输出图像的尺寸保持相同，但可能生成中还会发生一些偏移的情况，所以还会做**后处理：**
 
@@ -100,7 +104,8 @@ $$
 距离最小的类别就是这个像素的预测标签
 
 实验结果如下：
-![[Pasted image 20260614160416.png|400]]
+
+![[images/Pasted image 20260614160416.png|400]]
 
 任务的评价指标是 **mIoU（mean Intersection over Union）**，先计算每个类别与真实掩码的交并比：
 $$
@@ -115,8 +120,11 @@ $$
 ### Instance Segmentation
 
 实例分割的难度比语义分割更麻烦，它需要进一步区分同一个类别中的不同实例
-![[Pasted image 20260614161229.png]]
+
+![[images/Pasted image 20260614161229.png]]
+
 难点在于：
+
 - 图像中的实例数量未知
 - 无法像语义分割那样提前为每个实例指定颜色
 
@@ -178,21 +186,26 @@ $$
 **5.Spatially Constrained Merging**
 
 对于任意两个组件 $S_a$ 和 $S_b$，若**同时满足以下两个条件，则将其合并为同一个实例**：
-1.两个组件的平均颜色 $\mu_a, \mu_b$ 的欧氏距离不超过阈值 $\tau^2$：
+
+1. 两个组件的平均颜色 $\mu_a, \mu_b$ 的欧氏距离不超过阈值 $\tau^2$：
+
    $$
    \| \mu_a - \mu_b \|^2 \le \tau^2,
    $$
 
-2.合并后的面积不超过各自面积之和的 $\gamma$ 倍：
-$$
-A(S_a \cup S_b) \le \gamma \cdot \bigl( A(S_a) + A(S_b) \bigr)
-$$
+2. 合并后的面积不超过各自面积之和的 $\gamma$ 倍：
+
+   $$
+   A(S_a \cup S_b) \le \gamma \cdot \bigl( A(S_a) + A(S_b) \bigr)
+   $$
+
    其中 $A(\cdot)$ 表示组件的最小boxing面积，$\gamma = 5.0$ 
 
 
 实验结果：
 
-![[Pasted image 20260614165204.png|500]]
+![[images/Pasted image 20260614165204.png|500]]
+
 **实例分割的评价指标为**
 
 **1. pmF₁**
@@ -203,9 +216,11 @@ P_{\text{micro}}(t) = \frac{\sum_i TP_i(t)}{\sum_i TP_i(t) + \sum_i FP_i(t)},\qq
 R_{\text{micro}}(t) = \frac{\sum_i TP_i(t)}{\sum_i TP_i(t) + \sum_i FN_i(t)}
 $$
 其中：
+
 - $TP_i(t)$：匹配成功的预测掩码数量
 - $FP_i(t)$：预测掩码中未被匹配的数量
 - $FN_i(t)$：真实掩码中未被匹配的数量
+
 然后得到该阈值的 $F_1(t)$：
 $$
 F_1(t) = 2 \cdot \frac{P_{\text{micro}}(t) \cdot R_{\text{micro}}(t)}{P_{\text{micro}}(t) + R_{\text{micro}}(t)}
@@ -232,6 +247,7 @@ $$
 $$
 
 其中：
+
 -  $\mathrm{TP}_{\text{img}}$：**实际存在** 且 **模型判定存在** 的实例数量
 -  $\mathrm{TN}_{\text{img}}$：**实际不存在** 且 **模型判定不存在** 的实例数量
 -  $\mathrm{FP}_{\text{img}}$：**实际不存在** 但 **模型判定存在** 的实例数量
@@ -240,6 +256,7 @@ $$
 SA‑Co/Gold 基准包含大量**负样本**（图像中不存在查询的名词短语）。Vision Banana 本身没有被训练来输出“全空”图像，因此需要额外判断目标是否存在。
 
 这指标的计算和 Vision Banana无关：
+
 - 用 **Gemini 3.1 Flash‑Lite** 回答prompt：  
     `"Is there an instance of <NP> visible in this image? Choose your answer from (A): Yes, (B): No."`
 - 如果 Gemini 回答 Yes，才调用 Vision Banana 生成实例分割掩码；否则直接返回空集
@@ -258,11 +275,13 @@ $$
 
 这个和最开始的语义分割差不多，但需要引入 Gemini 2.5 pro把prompt文本转换成更简单的描述，然后喂给 Vision Banana 分割，论文没对这里展开细致的描述，我估计后处理和语义分割一致
 
-![[Pasted image 20260614171754.png]]
+![[images/Pasted image 20260614171754.png]]
 
 
 实验结果：
-![[Pasted image 20260614172352.png]]
+
+![[images/Pasted image 20260614172352.png]]
+
 评价指标是 **cIoU** 和 **gIoU（global IoU）**
 $$
 \mathrm{gIoU} = \frac{
@@ -310,7 +329,8 @@ $$
 就得到了该深度下对应的RGB值
 
 下面的数字表示这个颜色大致对应的深度，
-![[Pasted image 20260614202057.png]]
+
+![[images/Pasted image 20260614202057.png]]
 
 以红色为例，坐标 $(1,0,0)$ 对应的 $u=\frac{1}{7}$ 。第一次映射的函数：
 $$
@@ -330,12 +350,14 @@ $$
 
 效果如下：
 
-![[Pasted image 20260614204637.png]]
+![[images/Pasted image 20260614204637.png]]
 
 
 实验结果：
 
-![[Pasted image 20260614210455.png]]评测指标：
+![[images/Pasted image 20260614210455.png]]
+
+评测指标：
 $$
 \text{AbsRel} = \frac{1}{|P|} \sum_{p \in P} \frac{|d_p - \hat{d}_p|}{d_p}
 $$
@@ -343,6 +365,7 @@ $$
 \delta_1 = \frac{1}{|P|} \sum_{p \in P} \left[ \max\left(\frac{d_p}{\hat{d}_p}, \frac{\hat{d}_p}{d_p}\right) < 1.25 \right]
 $$
 其中：
+
 - $d_p$​：真实深度
 - $\hat{d}_p$：预测深度（米）
 - $P$：有效像素集合（排除无效点）
@@ -379,11 +402,12 @@ B &= \operatorname{trunc}\left(\frac{1 + z}{2},\, \min=0,\, \max=1\right) \times
 $$
 
 生成效果：
-![[Pasted image 20260614212237.png|500]]
+
+![[images/Pasted image 20260614212237.png|500]]
 
 实验结果：
 
-![[Pasted image 20260614212216.png]]
+![[images/Pasted image 20260614212216.png]]
 
 $$
 \text{Mean} = \frac{1}{|P|} \sum_{p \in P} \arccos( \mathbf{n}_p \cdot \hat{\mathbf{n}}_p ) \times \frac{180}{\pi}
