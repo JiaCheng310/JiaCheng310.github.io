@@ -110,6 +110,8 @@ website:
             contents:
               - text: "贝尔曼方程"
                 href: "强化学习/1.强化学习基础/Bellman Equation.qmd"
+              - text: "贝尔曼最优方程"
+                href: "强化学习/1.强化学习基础/Bellman Optimal Equation.qmd"
       - section: "Part 4: 论文精读"
         contents:
           - text: "论文精读"
@@ -118,3 +120,7 @@ website:
             contents:
               - text: "ACT（Action Chunking Transformer）"
                 href: "论文精读/1.具身智能/ACT.qmd"
+          - section: "2.计算机视觉"
+            contents:
+              - text: "Vision Banana 视觉大一统"
+                href: "论文精读/2.计算机视觉/Vision Banana.qmd"

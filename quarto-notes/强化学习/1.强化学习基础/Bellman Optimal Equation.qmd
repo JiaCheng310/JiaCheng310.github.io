@@ -1,9 +1,11 @@
 ---
-title: 贝尔曼方程
+title: 贝尔曼最优方程
 author: Jiacheng Zhang
 date: 2026-06-06
-description: 简要介绍贝尔曼方程及其求解
-categories: ["强化学习", "Bellman Equation"]
+description: 简要介绍贝尔曼最优方程及其求解
+categories:
+  - 强化学习
+  - Bellman Equation
 ---
 ## 基本记号
 

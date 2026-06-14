@@ -1,0 +1,432 @@
+---
+title: Vision Banana 视觉大一统
+author: Jiacheng Zhang
+date: 2026-06-12
+description: '""'
+categories:
+  - 论文精读
+  - CV
+draft: false
+---
+
+## 论文信息
+
+| Item  | Content                                         |
+| ----- | ----------------------------------------------- |
+| Title | Image Generators are Generalist Vision Learners |
+| Paper | https://arxiv.org/abs/2604.20329                |
+| Code  | None                                            |
+
+
+# Task
+
+验证**强图像生成模型是否学习到了视觉通用能力**，它提出 **Vision Banana**，做法是把一个强大的图像生成模型 **Nano Banana Pro** 作为 base model，然后用少量视觉任务数据做 instruction-tuning。模型仍然输出 RGB 图像，但这些 RGB 图像会进一步解码成分割、深度估计等视觉任务结果。
+
+具体的任务主要有：
+
+**原生任务：**
+1. Text-to-Image
+2. Image Editing
+论文要求模型在理解其他视觉任务的基础上**保持原有的文生图和图片编辑能力**。
+
+**2D视觉**：
+ 1. Semantic Segmentation（语义分割）
+ 2. Instance Segmentation（实例分割）
+ 3. Referring Expression Segmentation（指代分割）
+
+**3D视觉**：
+1. Depth Estimation（深度估计）
+2. Surface Normal Estimation（表面法向量估计）
+
+
+
+![[Pasted image 20260614144618.png]]
+
+更形式化地，给定一个预训练图像生成器$G_{\theta_0}$，它原本学习的是条件图像生成分布：
+$$
+p_{\theta_0}(x_{\text{out}}\mid c)  
+$$
+其中 $c$ 可以是文本 prompt、输入图像、编辑指令等，作者想验证是否存在一个轻量对齐后的模型$G_{\theta}$
+使得对一组视觉任务：
+$$  
+\mathcal{T}
+=
+\{  
+\text{语义分割},  
+\text{实例分割},  
+\text{指代性表达分割},  
+\text{深度估计},  
+\text{表面法向量估计}  
+\}  
+$$
+都可以通过同一个生成器完成：
+$$
+\hat{r}_t = G_{\theta}(x,p_t)  
+$$
+$$
+\hat{y}_t = \psi_t(\hat{r}_t)  
+$$
+其中：
+- $x$：输入图像
+- $p_t$：任务 $t$ 的文本指令
+- $\hat{r}_t \in [0,1]^{H\times W\times 3}$：模型生成的 RGB 任务可视化图
+- $\psi_t$：把 RGB 图解码回标准视觉输出的函数
+- $\hat{y}_t$：最终视觉任务输出
+
+
+## Challenge
+
+第一个问题是生成模型**难以严格遵循指令生成可解码的视觉输出**，例如可以直接要求生成模型按语义分割图片，但没法解码，从而计算评价指标量化性能
+
+第二个问题是**视觉理解任务输出空间不统一**，对于不同任务，传统做法是每类任务安排一个输出头，针对任务设计架构、目标，但这没有统一视觉理解，往往是Task- Specific的，还会削弱模型原生的生成能力
+
+
+![[Pasted image 20260614154704.png]]
+
+## Method
+
+### Semantic Segmentation
+
+Vision Banana 把语义分割当作一个特殊的图像生成任务：  输入一张图像和一段文本提示（描述什么类别用什么颜色），生成一张彩色图，图中每个像素的颜色直接表示该像素所属的类别
+
+![[Pasted image 20260614155125.png]]
+
+输入图像和输出图像的尺寸保持相同，但可能生成中还会发生一些偏移的情况，所以还会做**后处理：**
+
+对于对每个像素的 $(R,G,B)$ 值，计算它与prompt 中预定义类别的颜色（例如上面猫耳的 $(255,165,0)$）的欧氏距离：
+$$
+d = \sqrt{(R-255)^2+(G-165)^2+(B-0)^2}
+$$
+距离最小的类别就是这个像素的预测标签
+
+实验结果如下：
+![[Pasted image 20260614160416.png|400]]
+
+任务的评价指标是 **mIoU（mean Intersection over Union）**，先计算每个类别与真实掩码的交并比：
+$$
+\text{IoU}_c = \frac{|P_c \cap G_c|}{|P_c \cup G_c|}
+$$
+再取平均：
+$$
+\text{mIoU} = \frac{1}{C} \sum_{c=1}^{C} \text{IoU}_c
+$$
+
+
+### Instance Segmentation
+
+实例分割的难度比语义分割更麻烦，它需要进一步区分同一个类别中的不同实例
+![[Pasted image 20260614161229.png]]
+难点在于：
+- 图像中的实例数量未知
+- 无法像语义分割那样提前为每个实例指定颜色
+
+论文的做法是提示模型只输出包含目标类和背景颜色（这个颜色要指定）的RGB图像，并指示模型为每个单独的实例分配一个唯一的、不同的颜色（例如上述的牌子和面包）
+
+后处理是一个稍微复杂的聚类算法：
+
+**1.Background Initialization**
+
+对每个像素 $p$，考虑它的RGB值 $C(p)$ ，如果与背景色的RGB值 $C_{BG}$ 的欧式距离小于一个阈值 $\tau$，则直接判定成背景色：
+$$
+\|C(p)-C_{BG}\|^2<\tau^2
+$$
+论文里面设置 $\tau=14$
+
+
+
+**2.Color Similarity Grouping**
+
+对于剩下非背景色的像素 $p$，使用16‑连通的 floodfill 算法进行初始聚类。它会按一定顺序扫描，然后遇到未被归入某一组件的像素，取它作为种子像素 $p_{seed}$ ，计算：
+$$
+\|C(p_{seed})-C(p_i)\|^2\leq \tau^2
+$$
+满足这一式子就归入同一组，不断不断扩展直到没有新像素加入，得到初始组件集合
+
+
+
+**3.Noise Pruning**
+
+删除面积过小的组件：
+$$
+|S| < \theta_{\text{size}} \cdot(H\cdot W)
+$$
+其中 $\theta_{\text{size}} = 2\times 10^{-4}$  
+
+
+
+**4.Boundary Artifact Elimination**
+
+图像中可能在组件边缘出现伪影，采用下面的操作：
+使用一个 $3 \times 3$的正方形结构元素 $K$ 对组件 $S$ 进行 **binary erosion**操作，记作 $S \ominus K$。binary erosion的定义为：
+$$
+S \ominus K = \{ p \mid K_p \subseteq S \},
+$$
+即只有当一个像素 $p$ 的 $3 \times 3$ 邻域完全包含在 $S$ 内时，该像素才被保留，否则被移除。
+计算 binary erosion 后的像素保留比例：
+$$
+r = \frac{|S \ominus K|}{|S|},
+$$
+其中 $|\cdot|$ 表示组件的像素总数。
+若保留比例小于阈值 $\theta_{\text{erosion}}$，则判定该组件为边界伪影并将其丢弃（重新标记为背景）：
+$$
+r < \theta_{\text{erosion}}
+$$
+其中$\theta_{\text{erosion}} = 0.1$
+
+
+
+**5.Spatially Constrained Merging**
+
+对于任意两个组件 $S_a$ 和 $S_b$，若**同时满足以下两个条件，则将其合并为同一个实例**：
+1.两个组件的平均颜色 $\mu_a, \mu_b$ 的欧氏距离不超过阈值 $\tau^2$：
+   $$
+   \| \mu_a - \mu_b \|^2 \le \tau^2,
+   $$
+
+2.合并后的面积不超过各自面积之和的 $\gamma$ 倍：
+$$
+A(S_a \cup S_b) \le \gamma \cdot \bigl( A(S_a) + A(S_b) \bigr)
+$$
+   其中 $A(\cdot)$ 表示组件的最小boxing面积，$\gamma = 5.0$ 
+
+
+实验结果：
+
+![[Pasted image 20260614165204.png|500]]
+**实例分割的评价指标为**
+
+**1. pmF₁**
+
+对于每个 IoU 阈值 $t \in \{0.50, 0.55, \dots, 0.95\}$，先计算微平均精度和召回率：
+$$
+P_{\text{micro}}(t) = \frac{\sum_i TP_i(t)}{\sum_i TP_i(t) + \sum_i FP_i(t)},\qquad
+R_{\text{micro}}(t) = \frac{\sum_i TP_i(t)}{\sum_i TP_i(t) + \sum_i FN_i(t)}
+$$
+其中：
+- $TP_i(t)$：匹配成功的预测掩码数量
+- $FP_i(t)$：预测掩码中未被匹配的数量
+- $FN_i(t)$：真实掩码中未被匹配的数量
+然后得到该阈值的 $F_1(t)$：
+$$
+F_1(t) = 2 \cdot \frac{P_{\text{micro}}(t) \cdot R_{\text{micro}}(t)}{P_{\text{micro}}(t) + R_{\text{micro}}(t)}
+$$
+最后对所有 10 个阈值取平均：
+$$
+\mathrm{pmF}_1 = \frac{1}{10} \sum_{t} F_1(t)
+$$
+
+**2. IL_MCC**
+
+定义图像级混淆矩阵元素  $\mathrm{TP}_{\text{img}}$、$\mathrm{TN}_{\text{img}}$、$\mathrm{FP}_{\text{img}}$、$\mathrm{FN}_{\text{img}}$，计算：
+$$
+\mathrm{IL\_MCC} = \frac{
+    \mathrm{TP}_{\text{img}} \cdot \mathrm{TN}_{\text{img}} - \mathrm{FP}_{\text{img}} \cdot \mathrm{FN}_{\text{img}}
+}{
+    \sqrt{ 
+        (\mathrm{TP}_{\text{img}} + \mathrm{FP}_{\text{img}})
+        (\mathrm{TP}_{\text{img}} + \mathrm{FN}_{\text{img}})
+        (\mathrm{TN}_{\text{img}} + \mathrm{FP}_{\text{img}})
+        (\mathrm{TN}_{\text{img}} + \mathrm{FN}_{\text{img}})
+    }
+}
+$$
+
+其中：
+-  $\mathrm{TP}_{\text{img}}$：**实际存在** 且 **模型判定存在** 的实例数量
+-  $\mathrm{TN}_{\text{img}}$：**实际不存在** 且 **模型判定不存在** 的实例数量
+-  $\mathrm{FP}_{\text{img}}$：**实际不存在** 但 **模型判定存在** 的实例数量
+-  $\mathrm{FN}_{\text{img}}$：**实际存在** 但 **模型判定不存在** 的实例数量
+
+SA‑Co/Gold 基准包含大量**负样本**（图像中不存在查询的名词短语）。Vision Banana 本身没有被训练来输出“全空”图像，因此需要额外判断目标是否存在。
+
+这指标的计算和 Vision Banana无关：
+- 用 **Gemini 3.1 Flash‑Lite** 回答prompt：  
+    `"Is there an instance of <NP> visible in this image? Choose your answer from (A): Yes, (B): No."`
+- 如果 Gemini 回答 Yes，才调用 Vision Banana 生成实例分割掩码；否则直接返回空集
+
+**3. cgF₁**
+$$
+\mathrm{cgF}_1 = 100 \times \mathrm{pmF}_1 \times \mathrm{IL\_MCC}
+$$
+
+
+
+
+
+
+### Referring Expression Segmentation
+
+这个和最开始的语义分割差不多，但需要引入 Gemini 2.5 pro把prompt文本转换成更简单的描述，然后喂给 Vision Banana 分割，论文没对这里展开细致的描述，我估计后处理和语义分割一致
+
+![[Pasted image 20260614171754.png]]
+
+
+实验结果：
+![[Pasted image 20260614172352.png]]
+评价指标是 **cIoU** 和 **gIoU（global IoU）**
+$$
+\mathrm{gIoU} = \frac{
+    \left| \bigcup_{i=1}^{N} P_i \;\cap\; \bigcup_{i=1}^{N} G_i \right|
+}{
+    \left| \bigcup_{i=1}^{N} P_i \;\cup\; \bigcup_{i=1}^{N} G_i \right|
+}
+$$
+
+
+
+### Depth Estimation 
+
+深度估计想要解决的问题是：输入一张图片，输出每个像素 $p$ 到相机平面的物理距离：
+$$
+d(p) \in [0,\infty]
+$$
+难点主要有两个：
+- 单目深度估计本身是病态的，它把3D世界信息压缩成一张图片
+- 许多方法会使用相机内参，但论文只考虑使用生成模型
+
+
+**建立双射**
+
+由于深度是无界的，模型输出的RGB图有界，方便起见，论文会把RGB归一化，从而它们所在的空间变为$[0,1]^3$，论文考虑的是两步映射，先建立一个深度到$[0,1]$的双射（前人的变换）：
+$$
+f(d) = 1-(1-\frac{d}{\lambda c})^{\lambda+1}
+$$
+其中 $\lambda = -3$，$c = \frac{10}{3}$ 
+
+因此我们可以得到：
+$$
+u = f(d) \in [0,1)
+$$
+进一步考虑下面的立方体，让 $u$ 沿着这个立方体的路径从黑色到白色分段线性插值，具体来说：
+
+立方体一共有 $7$ 条边，把 $u\in[0,1)$ 映射到总长度上：
+$$
+s=7u
+$$
+则 $k=\lfloor s\rfloor$ 代表了所在的边，$\alpha = s- k$ 表示在这条边上走过的比例，对这条边的两点分段线性插值：
+$$
+RGB(u) = (1-\alpha v_k)+\alpha v_{k+1}
+$$
+就得到了该深度下对应的RGB值
+
+下面的数字表示这个颜色大致对应的深度，
+![[Pasted image 20260614202057.png]]
+
+以红色为例，坐标 $(1,0,0)$ 对应的 $u=\frac{1}{7}$ 。第一次映射的函数：
+$$
+ u= f(d) = 1-(1+\frac{d}{10})^{-2}
+$$
+其反函数为：
+$$
+d = 10(\frac{1}{\sqrt{1-u}}-1)
+$$
+那么对应红色的深度大约为：
+$$
+d_{(1,0,0)} = 10(\sqrt{\frac{7}{6}}-1)\approx 0.80
+$$
+
+
+由于上述两步映射都是可逆的，因此模型生成RGB图像，解码用反函数就可以倒推回深度（同上）
+
+效果如下：
+
+![[Pasted image 20260614204637.png]]
+
+
+实验结果：
+
+![[Pasted image 20260614210455.png]]评测指标：
+$$
+\text{AbsRel} = \frac{1}{|P|} \sum_{p \in P} \frac{|d_p - \hat{d}_p|}{d_p}
+$$
+$$
+\delta_1 = \frac{1}{|P|} \sum_{p \in P} \left[ \max\left(\frac{d_p}{\hat{d}_p}, \frac{\hat{d}_p}{d_p}\right) < 1.25 \right]
+$$
+其中：
+- $d_p$​：真实深度
+- $\hat{d}_p$：预测深度（米）
+- $P$：有效像素集合（排除无效点）
+
+
+
+
+### Surface Normal Estimation
+
+
+表面法向量估计的任务是，输入一张RGB图像，输出每个像素点的法线朝向（一个单位向量）：
+$$
+\begin{aligned}
+&n = (x,y,z)\\
+\end{aligned}
+$$
+其中，$\|n\|= 1,\quad x,y,z\in[-1,1]$ 
+
+论文中使用的坐标系是相机坐标系（右手系），方向设定如下：
+$$
+\begin{aligned}
+&x:\text{向右}\\
+&y:\text{向上}\\
+&z:\text{场景朝向相机}
+\end{aligned}
+$$
+映射如下：
+$$
+\begin{aligned}
+R &= \operatorname{trunc}\left(\frac{1 - x}{2},\, \min=0,\, \max=1\right) \times 255 \\
+G &= \operatorname{trunc}\left(\frac{1 + y}{2},\, \min=0,\, \max=1\right) \times 255 \\
+B &= \operatorname{trunc}\left(\frac{1 + z}{2},\, \min=0,\, \max=1\right) \times 255
+\end{aligned}
+$$
+
+生成效果：
+![[Pasted image 20260614212237.png|500]]
+
+实验结果：
+
+![[Pasted image 20260614212216.png]]
+
+$$
+\text{Mean} = \frac{1}{|P|} \sum_{p \in P} \arccos( \mathbf{n}_p \cdot \hat{\mathbf{n}}_p ) \times \frac{180}{\pi}
+$$
+$$
+\text{Median} = \underset{p \in P}{\operatorname{median}} \; \arccos( \mathbf{n}_p \cdot \hat{\mathbf{n}}_p ) \times \frac{180}{\pi}
+$$
+
+
+## Novelty
+
+第一个创新点是 **统一视觉任务输出为 RGB 图像**
+
+【创新点解决的问题是什么】传统视觉模型为每个任务设计专用输出头（语义分割头、深度回归头等），模型无法统一处理多种任务，也难以在不改变架构的前提下扩展新任务。
+
+【受哪个 insight 启发】文本生成可以作为语言任务的通用接口，那么图像生成也可以作为视觉任务的通用接口——只要将任务输出编码为 RGB 彩色图
+
+【设计了什么创新点】将语义分割、实例分割、指代分割、深度估计、表面法线估计的输出全部映射为 RGB 图像，通过文本提示选择任务，一个模型、一套权重完成多种理解与生成任务。
+
+ 
+ 第二个创新点是 **可逆的深度彩色编码**
+
+【创新点解决的问题是什么】单目深度估计需要输出物理尺度（米），而生成模型只能输出 RGB 图像，且要求该映射可逆才能从图像解码回深度值。
+
+【受哪个 insight 启发】使用非线性变换（幂变换）将无限深度范围压缩到有限区间，再沿着 RGB 立方体的边缘进行分段线性插值。
+
+【设计了什么创新点】设计了两步可逆映射，全程无需相机内参。
+
+
+第三个创新点是 **轻量级指令微调 + 保留生成能力**
+
+【创新点解决的问题是什么】以往将生成模型用于理解任务时，往往进行全参数微调或添加专用模块，导致模型丧失原有的图像生成与编辑能力
+
+【受哪个 insight 启发】LLM 通过低比例的指令微调即可对齐任务格式，而不损坏基础生成能力。类比到视觉，只需用极少量视觉任务数据教会模型输出我们需要的彩色图，就能解锁已有表征能力
+
+【设计了什么创新点】将视觉任务数据（约总数据量的 0.01%–0.05%）混入基础生成模型 Nano Banana Pro 的原始训练混合中，统一使用标准生成损失。结果 Vision Banana 在多个理解任务上达 SOTA，同时在 GenAI‑Bench 和 ImgEdit 上与基础模型胜率接近 50%，证明生成能力几乎无损。
+
+
+
+## 局限性
+
+
+1. 生成模型的推理计算开销很大
+2. 依赖外部多模态大模型弥补自身不足
+3. 后处理流程复杂且对超参数敏感
+4. 任务覆盖是否有限？
