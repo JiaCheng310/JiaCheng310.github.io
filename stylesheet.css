@@ -149,6 +149,16 @@ a {
   font-size: 14px;
 }
 
+.profile-photo {
+  display: block;
+  width: 88%;
+  max-width: 260px;
+  aspect-ratio: 1;
+  margin: 0 auto;
+  border-radius: 18px;
+  object-fit: cover;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -968,6 +978,28 @@ span.highlight {
 }
 
 @media (max-width: 680px) {
+  .profile-layout,
+  .profile-layout tbody,
+  .profile-layout tr,
+  .profile-layout td {
+    display: block;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  .profile-copy {
+    padding: 8% 6% 2% !important;
+  }
+
+  .profile-photo-cell {
+    padding: 0 6% 8% !important;
+  }
+
+  .profile-photo {
+    width: min(72vw, 260px);
+  }
+
   .mountain-stage,
   .mountain-content {
     min-height: 440px;
