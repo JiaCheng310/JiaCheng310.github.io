@@ -105,6 +105,20 @@ a.a1:hover { color:rgb(95, 23, 110);
   gap: 4px;
 }
 
+.contact-placeholder {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #9ca3af;
+  opacity: 0.72;
+  user-select: none;
+}
+
+.contact-separator {
+  margin: 0 2px;
+  color: #d1d5db;
+}
+
 .contact-links .email-link {
   gap: 6px;
   max-width: 100%;
@@ -467,8 +481,7 @@ name {
 abs {
   font-family: 'Lato', Verdana, Helvetica, sans-serif;
   font-size: 14px;
-  color:
-  	#EB6400;
+  color: #EB6400;
 }
 .one {
   width: 160px;
