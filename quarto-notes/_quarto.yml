@@ -53,7 +53,7 @@ website:
   page-navigation: true
   navbar:
     right:
-      - text: Blog
+      - text: Home
         href: "https://jiacheng310.github.io/"
       - text: GitHub
         href: "https://github.com/JiaCheng310"
