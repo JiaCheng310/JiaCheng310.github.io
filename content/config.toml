@@ -1,0 +1,77 @@
+[site]
+title = "Jiacheng Zhang"
+description = "Personal website of Jiacheng Zhang, an undergraduate student at the School of Mathematics, Sun Yat-sen University."
+favicon = "/favicon.svg"
+last_updated = "August 23, 2026"
+
+[author]
+name = "张家铖 | Jiacheng Zhang"
+title = "Undergraduate Student"
+institution = "School of Mathematics, Sun Yat-sen University"
+avatar = "/bio.jpg"
+
+[social]
+email = "zhangjch98@mail2.sysu.edu.cn"
+cv = ""
+twitter = ""
+rednote = ""
+google_scholar = ""
+github = "https://github.com/JiaCheng310"
+
+[features]
+enable_likes = false
+enable_one_page_mode = false
+
+[i18n]
+enabled = false
+locales = ["en"]
+default_locale = "en"
+mode = "fixed"
+fixed_locale = "en"
+persist = false
+switcher = false
+
+[i18n.labels]
+en = "English"
+
+[[navigation]]
+title = "About"
+type = "page"
+target = "about"
+href = "/"
+
+[[navigation]]
+title = "Publications"
+type = "page"
+target = "publications"
+href = "/publications/"
+
+[[navigation]]
+title = "Experience"
+type = "page"
+target = "experience"
+href = "/experience/"
+
+[[navigation]]
+title = "Projects"
+type = "page"
+target = "projects"
+href = "/projects/"
+
+[[navigation]]
+title = "Service"
+type = "page"
+target = "service"
+href = "/service/"
+
+[[navigation]]
+title = "Awards"
+type = "page"
+target = "awards"
+href = "/awards/"
+
+[[navigation]]
+title = "Notes"
+type = "link"
+target = "notes"
+href = "/notes/"

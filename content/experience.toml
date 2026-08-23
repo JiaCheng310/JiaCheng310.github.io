@@ -1,0 +1,12 @@
+type = "card"
+title = "Experience"
+
+[[items]]
+title = "Sun Yat-sen University"
+subtitle = "School of Mathematics"
+date = "2023 - 2027 (Expected)"
+content = """
+**Undergraduate Student**
+
+Research Advisor: [Weijiang Yu](https://yuweijiang.github.io/)
+"""

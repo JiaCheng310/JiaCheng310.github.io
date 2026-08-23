@@ -1,4 +1,4 @@
-name: Deploy static homepage to Pages
+name: Deploy PRISM homepage and Notes to Pages
 
 on:
   push:
@@ -25,6 +25,18 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Build PRISM homepage
+        run: |
+          npm ci --ignore-scripts
+          npm run build
+          test -f out/index.html
+
       - name: Setup Quarto
         uses: quarto-dev/quarto-actions/setup@v2
         with:
@@ -35,13 +47,15 @@ jobs:
           test "$(quarto --version)" = "1.10.18"
           quarto render quarto-notes
           python3 quarto-notes/scripts/optimize-math-html.py --check
-          mkdir -p site/notes
-          cp -R quarto-notes/_site/. site/notes/
+          mkdir -p out/notes
+          cp -R quarto-notes/_site/. out/notes/
+          touch out/.nojekyll
+          test -f out/notes/index.html
 
-      - name: Upload homepage
+      - name: Upload website
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./site
+          path: ./out
 
   deploy:
     environment:

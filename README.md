@@ -1,58 +1,25 @@
-# Jiacheng's blog
+# Jiacheng Zhang's personal website
 
-这是一个基于 Hugo 架构的个人博客项目，视觉风格参考了 PaperMod。
+This repository powers [jiacheng310.github.io](https://jiacheng310.github.io/).
 
-## 目录结构
+The homepage uses the MIT-licensed [PRISM](https://github.com/xyjoey/PRISM) academic website template. Notes are authored separately with Quarto and published under `/notes/`.
 
-```text
-.
-├── archetypes/
-├── assets/
-├── content/
-│   ├── about.md
-│   ├── search.md
-│   └── posts/
-├── layouts/
-├── static/
-├── hugo.yaml
-├── OBSIDIAN.md
-└── obsidian/
-```
+## Local development
 
-## 写作方式
-
-推荐直接用 Obsidian 打开项目根目录，然后在 `content/posts/` 下写文章。
-
-新文章最简单的结构是：
-
-```text
-content/posts/my-new-post/index.md
-content/posts/my-new-post/cover.png
-```
-
-文章模板见：
-
-- [OBSIDIAN.md](./OBSIDIAN.md)
-- [obsidian/blog-post-template.md](位置编码（一）：Sinusoidal.md)
-
-## 发布流程
-
-写完内容后执行：
+The homepage requires Node.js 22 or newer.
 
 ```bash
-git add .
-git commit -m "发布新文章"
-git push
+npm ci
+npm run dev
 ```
 
-推送到 `main` 后，GitHub Actions 会自动构建并发布到 GitHub Pages。
+Personal details and page content live in `content/`. The profile image and favicon live in `public/`.
 
-## 本地预览
-
-本地预览需要安装 Hugo，然后运行：
+## Production build
 
 ```bash
-hugo server
+npm run build
+quarto render quarto-notes
 ```
 
-如果你还没安装 Hugo，也可以先继续写作，等需要本地预览时再安装。
+GitHub Actions combines the exported PRISM site with the rendered Quarto Notes and deploys the result to GitHub Pages after changes are pushed to `main`.
