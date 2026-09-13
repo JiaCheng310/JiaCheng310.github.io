@@ -1,4 +1,4 @@
-name: Deploy PRISM homepage and Notes to Pages
+name: Deploy homepage and Notes to Pages
 
 on:
   push:
@@ -25,16 +25,10 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-
-      - name: Build PRISM homepage
+      - name: Prepare static homepage
         run: |
-          npm ci --ignore-scripts
-          npm run build
+          mkdir -p out
+          cp -R site/. out/
           test -f out/index.html
 
       - name: Setup Quarto

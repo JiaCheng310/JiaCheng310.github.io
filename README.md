@@ -2,24 +2,26 @@
 
 This repository powers [jiacheng310.github.io](https://jiacheng310.github.io/).
 
-The homepage uses the MIT-licensed [PRISM](https://github.com/xyjoey/PRISM) academic website template. Notes are authored separately with Quarto and published under `/notes/`.
+The homepage is a lightweight static HTML/CSS site inspired by
+[Seohong Park's website](https://seohong.me/) and
+[Jon Barron's academic website template](https://github.com/jonbarron/jonbarron.github.io).
+Notes are authored separately with Quarto and published under `/notes/`.
 
 ## Local development
 
-The homepage requires Node.js 22 or newer.
-
 ```bash
-npm ci
-npm run dev
+python3 -m http.server --directory site 8000
 ```
 
-Personal details and page content live in `content/`. The profile image and favicon live in `public/`.
+The active homepage lives in `site/`. Its profile image is
+`site/images/profile.jpg`.
 
 ## Production build
 
 ```bash
-npm run build
 quarto render quarto-notes
 ```
 
-GitHub Actions combines the exported PRISM site with the rendered Quarto Notes and deploys the result to GitHub Pages after changes are pushed to `main`.
+GitHub Actions copies the static homepage, renders the Quarto Notes, and
+deploys the combined result to GitHub Pages after changes are pushed to
+`main`.
