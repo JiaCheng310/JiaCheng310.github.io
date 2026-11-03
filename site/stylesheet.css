@@ -21,7 +21,7 @@ h1 span { display: inline-block; font-size: 23px; white-space: nowrap; }
 p { margin: 0 0 20px; }
 /* Blank line between intro paragraphs, like the template's <br><br>. */
 .intro-text p { margin-bottom: 24px; }
-.portrait { display: block; flex: 0 0 30%; width: 30%; height: auto; border-radius: 5px; }
+.portrait { display: block; flex: 0 0 30%; width: 30%; height: auto; margin-right: 40px; border-radius: 5px; }
 .contact-links { display: flex; flex-wrap: wrap; gap: 20px; margin: 0; }
 /* Flex items are blocks, so reserve the hover border to avoid a 1px jump. */
 .contact-links a { border-bottom: 1px solid transparent; }
